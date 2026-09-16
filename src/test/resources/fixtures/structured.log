@@ -1,0 +1,1 @@
+{"t":{"$date":"2024-06-01T10:15:30.123+00:00"},"s":"I","c":"COMMAND","id":51803,"ctx":"conn12","msg":"Slow query","attr":{"type":"command","ns":"sales.orders","command":{"find":"orders","filter":{"status":"OPEN","amount":{"$gt":100}},"$db":"sales"},"planSummary":"IXSCAN { status: 1 }","durationMillis":742,"cpuNanos":2100000,"reslen":5120,"remote":"10.0.0.8:41712"}}

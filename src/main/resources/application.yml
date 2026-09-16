@@ -1,0 +1,13 @@
+server:
+  address: 127.0.0.1
+  port: 18080
+
+spring:
+  servlet:
+    multipart:
+      max-file-size: 12GB
+      max-request-size: 12GB
+
+mongodblog:
+  data-dir: ${user.dir}/data
+  open-browser: true

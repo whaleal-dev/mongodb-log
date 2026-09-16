@@ -1,0 +1,16 @@
+/target/
+/web/node_modules/
+/web/coverage/
+/data/
+/logs/
+.env
+.env.*
+!.env.example
+.DS_Store
+.idea/
+.vscode/
+.claude/
+.codex/
+.agents/
+*.iml
+

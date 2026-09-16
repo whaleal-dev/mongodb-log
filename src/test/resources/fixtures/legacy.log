@@ -1,0 +1,2 @@
+2025-03-10T13:28:38.624+0800 I COMMAND  [conn49] command local.oplog.rs command: find { find: "oplog.rs", filter: {}, sort: { $natural: 1 }, limit: 1, singleBatch: true, $db: "local" } planSummary: COLLSCAN keysExamined:0 docsExamined:1 nreturned:1 reslen:1756 325ms
+2025-03-10T13:32:51.984+0800 I WRITE    [conn150] update whaleal2.hostMonitor command: { q: { _id: "item-1" }, u: { $set: { count: 252 } }, multi: false, upsert: false } planSummary: IDHACK keysExamined:1 docsExamined:1 215ms
