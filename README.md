@@ -4,7 +4,7 @@
 
 面向运维人员的 MongoDB 本地离线分析工具。应用提供 `MongoDB Log` 与 `MongoDB Metric` 两个工作区，可分析日志、FTDC 指标及运行异常，不连接 MongoDB，也不会自动上传数据。
 
-本项目由作者独立主导，使用 AI 贯穿需求分析、产品设计、架构、编码、测试、审查、文档和发布整理全过程。功能与实现均从本项目的数据特征和资源边界出发，以当前源码、自动化测试、公开技术规范及实际样本为依据，不沿用其他项目代码或建设文档。
+本项目全程使用 AI 完成设计、编码、测试与文档编写。后续如需修改或扩展，建议继续使用 AI，并遵循项目规范与现有验证流程。项目虽由 AI 编程实现，但核心分析逻辑、统计口径与输出结果均已通过自动化测试、实际样本及人工复核验证。
 
 完整操作步骤见 [中文使用指南](docs/user-guide.md) 。运行后也可点击页面右上角的「使用说明」。
 
@@ -129,7 +129,7 @@ src/main/java/com/whaleal/mongodblog/
 └── web/         # REST API
 web/src/         # Vue 页面
 web/tests/       # 前端测试
-docs/            # 中英文用户指南
+docs/            # 设计、AI 改写与中英文用户指南
 scripts/         # 三个平台的启动脚本
 ```
 
@@ -168,6 +168,8 @@ mvn clean package
 ## 文档
 
 - [中文使用指南](docs/user-guide.md)
+- [项目设计详解](docs/design.md)
+- [AI 二次改写指南](docs/ai-rewrite-guide.md)
 - [English README](README.en.md)
 - [English User Guide](docs/user-guide.en.md)
 - [项目路线图](ROADMAP.md)

@@ -4,7 +4,7 @@
 
 A local, offline MongoDB analysis tool for operations engineers. It provides separate `MongoDB Log` and `MongoDB Metric` workspaces for inspecting logs, FTDC metrics, and runtime anomalies without connecting to MongoDB or automatically uploading data.
 
-The project is independently led by its author, with AI used throughout requirements analysis, product design, architecture, implementation, testing, review, documentation, and release preparation. Its behavior is derived from this repository’s source code, automated tests, public technical specifications, and verified samples; it does not reuse another project’s code or development documents.
+This project was designed, implemented, tested, and documented entirely with AI. Future changes or extensions are best made with AI while following the project rules and existing validation workflow. Although the project is AI-authored, its core analysis logic, statistical definitions, and outputs have been verified through automated tests, real-world samples, and human review.
 
 See the [English User Guide](docs/user-guide.en.md) for complete operating instructions. The running application also provides a Chinese help dialog through `使用说明` in the upper-right corner.
 
@@ -131,7 +131,7 @@ src/main/java/com/whaleal/mongodblog/
 └── web/         # REST API
 web/src/         # Vue application
 web/tests/       # Frontend tests
-docs/            # Chinese and English user guides
+docs/            # Design, AI rewrite, and user guides
 scripts/         # Platform launchers
 ```
 
@@ -172,6 +172,8 @@ mvn clean package
 - [English User Guide](docs/user-guide.en.md)
 - [中文项目介绍](README.md)
 - [中文使用指南](docs/user-guide.md)
+- [项目设计详解](docs/design.md) (Chinese)
+- [AI 二次改写指南](docs/ai-rewrite-guide.md) (Chinese)
 - [Project roadmap](ROADMAP.md) (Chinese)
 
 ## License

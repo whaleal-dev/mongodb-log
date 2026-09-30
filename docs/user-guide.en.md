@@ -15,7 +15,7 @@ MongoDB Log & Metric Analyzer is a local, offline file-analysis application with
 
 The application does not connect to a MongoDB server. Runtime use does not require MongoDB, Node.js, Nacos, S3, an AI service, or Internet access. The server listens only on `127.0.0.1:18080` by default, and all parsing and field interpretation happen on the local computer.
 
-The project is independently led by its author, with AI used across requirements analysis, product design, architecture, implementation, testing, review, and documentation. Current behavior is defined by the repository source, automated tests, public technical specifications, and verified samples rather than another project’s development documents.
+This project was designed, implemented, tested, and documented entirely with AI. Future changes or extensions are best made with AI while following the project rules and existing validation workflow. Although the project is AI-authored, its core analysis logic, statistical definitions, and outputs have been verified through automated tests, real-world samples, and human review.
 
 ## 2. Requirements
 
