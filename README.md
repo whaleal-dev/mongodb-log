@@ -39,6 +39,28 @@
 
 ## 快速启动
 
+### 使用 Docker（推荐）
+
+公开镜像位于 [Docker Hub](https://hub.docker.com/r/whaleal/mongodb-log-analyzer) ，支持 `linux/amd64` 与 `linux/arm64`。运行时不需要安装 Java、Node.js 或 MongoDB：
+
+```bash
+docker pull whaleal/mongodb-log-analyzer:0.1.0
+
+docker run -d \
+  --name mongodb-log-analyzer \
+  --restart unless-stopped \
+  --memory=3g \
+  -p 127.0.0.1:18080:18080 \
+  -v mongodb-log-analyzer-data:/app/data \
+  whaleal/mongodb-log-analyzer:0.1.0
+```
+
+启动后访问 `http://127.0.0.1:18080`。容器以非 root 用户运行，JVM 堆上限为 2 GB，命名卷 `mongodb-log-analyzer-data` 用于持久化任务数据。应用没有账号和授权机制，因此示例只向本机开放端口；不要把端口直接暴露到公网。升级或重建容器时保留该命名卷，也不要执行会删除它的 `docker compose down -v`。
+
+同时提供 `latest` 标签，但固定部署建议使用明确版本号 `0.1.0`。
+
+### 使用 JAR
+
 运行要求为 Java 17 或更高版本。发布目录需要同时包含 JAR 和启动脚本：
 
 ```text
@@ -164,6 +186,12 @@ mvn clean package
 ```
 
 `mvn clean package` 会先清理历史构建产物，再按锁文件安装前端依赖、构建 Vue 页面，并生成 `target/mongodb-log-analyzer.jar`。项目启动脚本也能直接找到该文件。
+
+也可以使用项目根目录的 `Dockerfile` 构建本地镜像。多阶段构建会运行前后端测试，并且最终镜像不包含 Maven、Node.js 或前端构建依赖：
+
+```bash
+docker build -t mongodb-log-analyzer:local .
+```
 
 ## 文档
 

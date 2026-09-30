@@ -19,12 +19,12 @@ This project was designed, implemented, tested, and documented entirely with AI.
 
 ## 2. Requirements
 
-- Java 17 or newer.
-- A release directory containing both `mongodb-log-analyzer.jar` and the `scripts` directory.
+- Docker: Docker Desktop or Docker Engine, with at least 3 GB of memory available to the container recommended.
+- JAR: Java 17 or newer, plus a release directory containing both `mongodb-log-analyzer.jar` and the `scripts` directory.
 - Enough free disk space for analysis results, temporary files, and retained Metric file copies.
-- Sufficient memory for the default `-Xms128m -Xmx2g` launcher settings. The 2 GB value limits only the Java heap; the process also uses a small amount of native and metaspace memory.
+- The Docker image and launchers use `-Xms128m -Xmx2g`. The 2 GB value limits only the Java heap; the container or process also uses native and metaspace memory.
 
-Expected release layout:
+Expected layout when using the JAR release:
 
 ```text
 mongodb-log-analyzer/
@@ -37,7 +37,25 @@ mongodb-log-analyzer/
 
 ## 3. Start and Stop the Application
 
-### macOS
+### Docker
+
+The public image supports `linux/amd64` and `linux/arm64`. Run:
+
+```bash
+docker run -d \
+  --name mongodb-log-analyzer \
+  --restart unless-stopped \
+  --memory=3g \
+  -p 127.0.0.1:18080:18080 \
+  -v mongodb-log-analyzer-data:/app/data \
+  whaleal/mongodb-log-analyzer:0.1.0
+```
+
+Open `http://127.0.0.1:18080` after startup. Use `docker stop mongodb-log-analyzer` to stop the application and `docker start mongodb-log-analyzer` to start it again.
+
+Task data is stored in the `mongodb-log-analyzer-data` named volume. You can recreate the container when upgrading the image, but keep mounting the same volume and avoid commands such as `docker compose down -v` that delete it. The application has no accounts or authorization, so do not expose the container port directly to the public Internet.
+
+### JAR release: macOS
 
 The first time, open a terminal in the release directory and run:
 
@@ -47,7 +65,7 @@ chmod +x scripts/start.command scripts/start.sh
 
 Then double-click `scripts/start.command`. You can also run `./scripts/start.sh` from a terminal.
 
-### Linux
+### JAR release: Linux
 
 Run:
 
@@ -55,7 +73,7 @@ Run:
 ./scripts/start.sh
 ```
 
-### Windows
+### JAR release: Windows
 
 Double-click `scripts\start.bat`.
 

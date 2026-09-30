@@ -36,6 +36,7 @@
 
 - 已实现 macOS、Linux、Windows 启动脚本，统一使用 `-Xms128m -Xmx2g`。
 - 已实现 Vue 前端随 Maven 构建打入可执行 Spring Boot JAR。
+- 已实现非 root、多阶段 Docker 镜像，并以 `whaleal/mongodb-log-analyzer` 在 Docker Hub 公开发布 `linux/amd64` 与 `linux/arm64` 双架构的 `0.1.0` 和 `latest` 标签。
 - 已提供中英文项目介绍、中英文用户指南和页面内使用说明。
 - 已提供详细项目设计文档，覆盖架构、数据流、全部现行功能、核心算法、接口、资源边界、隐私边界和验证体系。
 - 已提供 AI 二次改写指南，固定必读顺序、公开能力边界、不可破坏约束、分任务改写流程、验证矩阵和可复用提示词。
@@ -56,6 +57,7 @@
 
 ## 最近验证
 
+- 2026-09-30：新增 `Dockerfile` 与 `.dockerignore`；镜像构建内前端 14 个测试文件、49 项测试全部通过，后端 107 项测试零失败、2 项真实样本按环境条件跳过。`linux/arm64` 容器以非 root 用户启动，首页与内存接口冒烟通过，JVM 堆上限为 2 GB；Docker Hub 已以 `whaleal/mongodb-log-analyzer` 公开发布 `0.1.0` 与 `latest`，两者均包含 `linux/amd64`、`linux/arm64`，清单摘要为 `sha256:c49996ea14d1781d8f4fff1cf4d5ea4a2e7c4b41920aaa67b01f67d2ffb3daf2`。
 - 2026-09-30：新增 `docs/design.md` 与 `docs/ai-rewrite-guide.md`，统一中英文 AI 编程与验证说明，并逐项核对 Controller 路由、任务生命周期、解析与聚合常量、FTDC 索引和查询边界、前端公开入口及测试覆盖；全仓 Markdown 相对链接有效，代码围栏成对，`git diff --check` 通过。本轮仅修改文档，未重复运行后端和前端业务测试。
 - 2026-09-30：删除 10 份建设期设计／实施参考稿并完成中英文文档代码核对；6 份现行 Markdown 相对链接全部有效，废弃目录及本地绝对路径扫描无残留，`git diff --check` 通过。后端 107 项测试零失败、2 项真实样本按环境条件跳过；前端 14 个测试文件、49 项测试全部通过；前端生产构建和 `mvn clean package` 成功，JAR 仅包含本次生成的 `index.html`、JS 和 CSS 静态资源。
 - 2026-09-16：后端 107 项测试零失败、2 项真实样本按环境条件跳过；前端 49 项测试通过；前端生产构建与 Maven 打包成功。

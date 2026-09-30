@@ -41,6 +41,28 @@ See the [English User Guide](docs/user-guide.en.md) for complete operating instr
 
 ## Quick Start
 
+### Run with Docker (recommended)
+
+The public image is available on [Docker Hub](https://hub.docker.com/r/whaleal/mongodb-log-analyzer) for both `linux/amd64` and `linux/arm64`. Java, Node.js, and MongoDB are not required on the host:
+
+```bash
+docker pull whaleal/mongodb-log-analyzer:0.1.0
+
+docker run -d \
+  --name mongodb-log-analyzer \
+  --restart unless-stopped \
+  --memory=3g \
+  -p 127.0.0.1:18080:18080 \
+  -v mongodb-log-analyzer-data:/app/data \
+  whaleal/mongodb-log-analyzer:0.1.0
+```
+
+Open `http://127.0.0.1:18080` after the container starts. The container runs as a non-root user, caps the JVM heap at 2 GB, and persists task data in the `mongodb-log-analyzer-data` named volume. The application has no accounts or authorization, so the example publishes the port to the local machine only; do not expose it directly to the public Internet. Keep the named volume when upgrading or recreating the container, and avoid commands such as `docker compose down -v` that would delete it.
+
+The `latest` tag is also available, but pinned deployments should use the explicit `0.1.0` version.
+
+### Run the JAR
+
 Java 17 or newer is required. A release directory must contain the executable JAR and launcher scripts:
 
 ```text
@@ -166,6 +188,12 @@ mvn clean package
 ```
 
 `mvn clean package` removes historical build output, installs locked frontend dependencies, builds the Vue application, and generates `target/mongodb-log-analyzer.jar`. The repository launchers can run that file directly.
+
+You can also build a local image from the repository root. The multi-stage `Dockerfile` runs the frontend and backend tests, while the final image excludes Maven, Node.js, and frontend build dependencies:
+
+```bash
+docker build -t mongodb-log-analyzer:local .
+```
 
 ## Documentation
 

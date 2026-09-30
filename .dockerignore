@@ -1,0 +1,15 @@
+.git
+target
+web/node_modules
+web/coverage
+data
+logs
+
+.env
+.env.*
+.DS_Store
+.idea
+.vscode
+.claude
+.codex
+.agents

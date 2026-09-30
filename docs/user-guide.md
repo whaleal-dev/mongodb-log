@@ -17,12 +17,12 @@ MongoDB Log & Metric Analyzer 是在个人电脑上运行的本地离线分析�
 
 ## 2．运行要求
 
-- Java 17 或更高版本。
-- 发布目录中同时保留 `mongodb-log-analyzer.jar` 和 `scripts` 目录。
+- Docker 方式：安装 Docker Desktop 或 Docker Engine，建议给容器至少 3 GB 内存。
+- JAR 方式：安装 Java 17 或更高版本，并在发布目录中同时保留 `mongodb-log-analyzer.jar` 和 `scripts` 目录。
 - 启动磁盘需要有足够空间存放分析结果、临时文件和 Metric 文件副本。
-- 启动脚本默认使用 `-Xms128m -Xmx2g`。`2 GB` 是 Java 堆上限，不等于整个进程的全部内存占用。
+- Docker 镜像与启动脚本均使用 `-Xms128m -Xmx2g`。`2 GB` 是 Java 堆上限，不等于容器或进程的全部内存占用。
 
-标准发布目录：
+使用 JAR 时的标准发布目录：
 
 ```text
 mongodb-log-analyzer/
@@ -35,7 +35,25 @@ mongodb-log-analyzer/
 
 ## 3．启动与停止
 
-### macOS
+### Docker
+
+公开镜像支持 `linux/amd64` 与 `linux/arm64`。执行：
+
+```bash
+docker run -d \
+  --name mongodb-log-analyzer \
+  --restart unless-stopped \
+  --memory=3g \
+  -p 127.0.0.1:18080:18080 \
+  -v mongodb-log-analyzer-data:/app/data \
+  whaleal/mongodb-log-analyzer:0.1.0
+```
+
+启动后访问 `http://127.0.0.1:18080`。执行 `docker stop mongodb-log-analyzer` 停止，执行 `docker start mongodb-log-analyzer` 再次启动。
+
+任务数据保存在命名卷 `mongodb-log-analyzer-data` 中。升级镜像时可以重建容器，但要继续挂载该卷；不要执行会删除卷的 `docker compose down -v`。应用没有账号和授权机制，不要把容器端口直接暴露到公网。
+
+### JAR 发布包：macOS
 
 首次使用时，在终端执行：
 
@@ -45,7 +63,7 @@ chmod +x scripts/start.command scripts/start.sh
 
 之后双击 `scripts/start.command`。也可以在终端执行 `./scripts/start.sh`。
 
-### Linux
+### JAR 发布包：Linux
 
 执行：
 
@@ -53,7 +71,7 @@ chmod +x scripts/start.command scripts/start.sh
 ./scripts/start.sh
 ```
 
-### Windows
+### JAR 发布包：Windows
 
 双击 `scripts\start.bat`。
 
