@@ -15,6 +15,8 @@ MongoDB Log & Metric Analyzer is a local, offline file-analysis application with
 
 The application does not connect to a MongoDB server. Runtime use does not require MongoDB, Node.js, Nacos, S3, an AI service, or Internet access. The server listens only on `127.0.0.1:18080` by default, and all parsing and field interpretation happen on the local computer.
 
+The project is independently led by its author, with AI used across requirements analysis, product design, architecture, implementation, testing, review, and documentation. Current behavior is defined by the repository source, automated tests, public technical specifications, and verified samples rather than another project’s development documents.
+
 ## 2. Requirements
 
 - Java 17 or newer.
@@ -68,7 +70,7 @@ To stop the application, close the launcher window or press `Ctrl+C` in its term
 1. Select `MongoDB Log` at the top of the page.
 2. Optionally enter a task name. If left empty, the first file name becomes the default task name.
 3. Click `选择日志文件` (Select log files).
-4. Choose up to 20 plain-text, structured JSON, legacy single-line, or `.gz` log files.
+4. Choose up to 20 non-empty plain-text, structured JSON, legacy single-line, or `.gz` log files. `.zip`, `.bz2`, `.xz`, and `.7z` archives are not supported. The request also remains subject to the 12 GB server-side upload limit.
 5. Click `开始分析` (Start analysis).
 
 The files are streamed in the order selected and combined into one task. The page displays queued and running progress. Log analyses and Metric indexing tasks share one background worker thread, so a later Log or indexing task waits instead of competing with an active task for memory.
@@ -85,6 +87,7 @@ Useful interactions:
 - Switch a chart to its data-table view when exact values are needed.
 - Use the question-mark icon beside a metric name to see its unit, range, and aggregation rules.
 - Click a point in a slow-query scatter plot to inspect parsed fields, locally generated investigation hints, the retained record, and its original log text.
+- Filter retained slow-query details by namespace, operation, plan summary, or minimum duration. The backend returns at most 200 retained records per page.
 - The Top 50 query patterns initially appear by frequency. Clicking a column header only reorders the 50 already selected patterns; it does not change which patterns belong to the Top 50.
 - Drag the bottom-right corner of a metric panel to resize it. Layout is stored in the current browser and can be cleared with `恢复默认布局` (Restore default layout).
 - If parsing failed for some lines, the result page reports failed, partial, and skipped counts. Statistics include only fields that were extracted successfully.
@@ -96,6 +99,8 @@ The fixed latency buckets are `<100ms`, `100ms-500ms`, `500ms-1s`, `1s-3s`, `3s-
 Click `导出 AI 分析报告` (Export AI analysis report) to download a Markdown report for the current task. It includes aggregate statistics, normalized query patterns, and sanitized diagnostic information for human review or optional analysis with an AI tool.
 
 The application does not automatically send the report anywhere. It excludes full commands, complete raw logs, and attributes. During export it masks MongoDB URIs, IPv4 and IPv6 addresses, email addresses, and values explicitly labeled with `user`, `username`, `principal`, `password`, `passwd`, `token`, or `secret`. Task names, file names, namespaces, normalized query patterns, execution plans, and other aggregate fields can still appear, so review the exported file against your organization's data-security requirements before sharing it.
+
+The web interface renders timestamps in the browser’s local timezone. Exported Markdown reports use UTC so that events can be compared consistently across systems.
 
 ## 5. Use the MongoDB Metric Workspace
 
@@ -120,6 +125,8 @@ When the time between adjacent samples is significantly larger than the main sam
 
 Metric indexing and metric-group queries share a fair sequential execution gate. A long queued state usually means another heavy operation is active; the queued operation continues automatically afterward.
 
+When files contain the same timestamp, values from the file that appeared earlier in the upload order take precedence. Each metric returns at most 1,200 chart points, but minimum, maximum, average, and all-zero detection are calculated from every valid point in the requested range rather than from the downsampled output.
+
 ## 6. Tasks and Local Data
 
 The application stores managed task data under the `data` directory relative to its startup directory.
@@ -135,6 +142,7 @@ The application stores managed task data under the `data` directory relative to 
 - The source FTDC files selected by the user are never modified.
 - Uploaded copies, a metric catalog, and a binary block index are retained to support later queries.
 - A fully expanded copy of every time-series value is not persisted, but the retained FTDC copies still consume disk space.
+- Before each query, the retained source copy is checked against the file size and SHA-256 stored in the index. External modification causes the query to fail.
 
 ### Delete data
 
@@ -164,6 +172,7 @@ The application stores managed task data under the `data` directory relative to 
 - One task accepts at most 20 non-empty FTDC files.
 - One metric group contains at most 200 metrics.
 - Each metric chart returns at most 1,200 points. Chart points are bounded and downsampled, while `min`, `max`, `avg`, and all-zero detection are calculated from all valid source points.
+- One FTDC block may declare at most 10,000,000 uncompressed bytes and 100,000 samples, with at most 1,000,000 metric-sample cells. Files exceeding these bounds are rejected.
 - The product does not expose single-metric queries, raw-value pagination, or complete metric export.
 - If a retained FTDC source copy is changed outside the application, integrity verification fails and a new task must be created.
 
@@ -192,6 +201,10 @@ Log analyses and Metric indexing tasks share one background worker thread. Metri
 ### Metric tasks consume disk space
 
 Metric tasks retain application-managed source copies and indexes. Delete an unneeded task from the Metric task list to reclaim that space; the user's original files are not affected.
+
+### A Metric file is rejected
+
+The parser validates BSON documents, zlib lengths, metric and sample bounds, RLE data, and compressed-stream termination. Empty files, truncation, damaged data, inconsistent declared lengths, and files without a valid metric block fail explicitly. Obtain a complete original MongoDB FTDC file and create a new task.
 
 ### A historical task is missing newer data
 

@@ -22,9 +22,8 @@ mongodb-log/
 ├── README.md
 ├── pom.xml
 ├── docs/
-│   └── superpowers/
-│       ├── specs/
-│       └── plans/
+│   ├── user-guide.md
+│   └── user-guide.en.md
 ├── src/
 │   ├── main/
 │   │   ├── java/com/whaleal/mongodblog/
@@ -38,7 +37,7 @@ mongodb-log/
 └── scripts/
 ```
 
-后端按 `parser`、`analysis`、`task`、`storage`、`web` 分包，FTDC 子系统在对应包下使用 `ftdc` 子包并与日志任务隔离。一个类只承担一个明确职责，不把数据模型、解析、统计和接口混在同一个类中。
+后端按 `parser`、`analysis`、`report`、`task`、`storage`、`web` 分包，FTDC 子系统在对应包下使用 `ftdc` 子包并与日志任务隔离。一个类只承担一个明确职责，不把数据模型、解析、统计和接口混在同一个类中。
 
 业务元数据继续使用本地 JSON／JSONL。FTDC 任务允许在 `data/ftdc` 下保存上传的原始压缩文件和应用生成的 `blocks.idx` 二进制索引；不得把全量展开后的时间序列保存为 JSON、JSONL、数据库行或其他重复副本。
 
@@ -79,6 +78,8 @@ mongodb-log/
 
 ## 开发纪律
 
+- 本项目由作者独立主导，使用 AI 贯穿需求分析、产品设计、架构、编码、测试、审查、文档和发布整理全过程。
+- 项目功能、实现和文档只以当前源码、自动化测试、公开技术规范及实际样本验证为依据，不沿用其他项目代码或建设文档。
 - 功能与修复遵循测试驱动开发：先写失败测试，再写最小实现。
 - 产品方案、信息架构、交互和实现必须从本项目目标、数据特征和资源边界出发独立设计，不引用其他项目作为设计依据。
 - 设计文档、实施计划、测试命名和代码注释不得保留其他项目名称、本地路径、仓库链接或外部项目实现依据。
@@ -92,6 +93,6 @@ mongodb-log/
 
 - `mvn test` 必须通过。
 - `npm test` 和 `npm run build` 必须通过。
-- `mvn package` 必须生成可启动 JAR，并包含前端静态资源。
+- `mvn clean package` 必须从干净目录生成可启动 JAR，并只包含本次前端静态资源。
 - 使用真实或等价样例验证纯文本、JSON、GZip、混合格式、异常行和 Top 5000 边界。
 - 启动后必须通过浏览器完成上传、进度、结果页和明细查看的端到端验证。
