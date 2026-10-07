@@ -107,6 +107,7 @@ Useful interactions:
 - Click a point in a slow-query scatter plot to inspect parsed fields, locally generated investigation hints, the retained record, and its original log text.
 - Filter retained slow-query details by namespace, operation, plan summary, or minimum duration. The backend returns at most 200 retained records per page.
 - The Top 50 query patterns initially appear by frequency. Clicking a column header only reorders the 50 already selected patterns; it does not change which patterns belong to the Top 50.
+- Above the pattern table, search namespaces or query fields, select an operation type, and search plan text such as `COLLSCAN`. Text searches ignore case and surrounding whitespace; all active conditions must match. The table shows the matching count, and `重置` clears the filters. Filtering only narrows the already selected Top 50, resets when switching tasks, and does not change the task aggregates exported in the report.
 - Drag the bottom-right corner of a metric panel to resize it. Layout is stored in the current browser and can be cleared with `恢复默认布局` (Restore default layout).
 - If parsing failed for some lines, the result page reports failed, partial, and skipped counts. Statistics include only fields that were extracted successfully.
 

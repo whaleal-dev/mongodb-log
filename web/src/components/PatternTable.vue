@@ -1,5 +1,5 @@
 <script setup>
-import { computed, ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 import MetricHeader from './MetricHeader.vue'
 import MetricLabel from './MetricLabel.vue'
 import MetricPanel from './MetricPanel.vue'
@@ -10,19 +10,40 @@ const props = defineProps({ patterns: { type: Array, default: null } })
 defineEmits(['select'])
 const sortKey = ref('count')
 const ascending = ref(false)
+const keyword = ref('')
+const operation = ref('')
+const plan = ref('')
 const collator = new Intl.Collator('zh-CN', { numeric: true, sensitivity: 'base' })
 const keys = ['namespace', 'operation', 'pattern', 'planSummary', 'totalCpuNanos', 'count',
   'totalDurationMillis', 'averageDurationMillis', 'maxDurationMillis', 'minDurationMillis']
-const rows = computed(() => [...(props.patterns || [])].sort((a, b) => b.count - a.count).slice(0, 50).sort((a, b) => {
-  const key = sortKey.value
-  const left = key === 'totalCpuNanos' && !a.cpuAvailable ? null : a[key]
-  const right = key === 'totalCpuNanos' && !b.cpuAvailable ? null : b[key]
-  const absent = value => value == null || value === '' || (typeof value === 'number' && !Number.isFinite(value))
-  if (absent(left)) return absent(right) ? 0 : 1
-  if (absent(right)) return -1
-  const result = typeof left === 'number' && typeof right === 'number' ? left - right : collator.compare(String(left), String(right))
-  return ascending.value ? result : -result
-}))
+const topPatterns = computed(() => [...(props.patterns || [])].sort((a, b) => b.count - a.count).slice(0, 50))
+const operations = computed(() => [...new Set(topPatterns.value.map(row => row.operation).filter(Boolean))]
+  .sort(collator.compare))
+const hasFilters = computed(() => Boolean(keyword.value || operation.value || plan.value))
+const rows = computed(() => {
+  const query = keyword.value.trim().toLowerCase()
+  const planQuery = plan.value.trim().toLowerCase()
+  const matches = (value, search) => String(value ?? '').toLowerCase().includes(search)
+  return topPatterns.value.filter(row =>
+    (!query || matches(row.namespace, query) || matches(row.pattern, query))
+    && (!operation.value || row.operation === operation.value)
+    && (!planQuery || matches(row.planSummary, planQuery))).sort((a, b) => {
+    const key = sortKey.value
+    const left = key === 'totalCpuNanos' && !a.cpuAvailable ? null : a[key]
+    const right = key === 'totalCpuNanos' && !b.cpuAvailable ? null : b[key]
+    const absent = value => value == null || value === '' || (typeof value === 'number' && !Number.isFinite(value))
+    if (absent(left)) return absent(right) ? 0 : 1
+    if (absent(right)) return -1
+    const result = typeof left === 'number' && typeof right === 'number' ? left - right : collator.compare(String(left), String(right))
+    return ascending.value ? result : -result
+  })
+})
+function resetFilters() {
+  keyword.value = ''
+  operation.value = ''
+  plan.value = ''
+}
+watch(() => props.patterns, resetFilters)
 function sort(key) {
   ascending.value = sortKey.value === key ? !ascending.value : true
   sortKey.value = key
@@ -46,8 +67,19 @@ const sortLabel = computed(() => columns[keys.indexOf(sortKey.value)].label)
 <template>
   <MetricPanel layout-key="patterns" class="pattern-panel">
     <MetricHeader title="查询模式统计 · Top 50" :subtitle="`${sortKey === 'count' ? '按出现次数排序' : '按' + sortLabel + '排序'} · ${ascending ? '升序' : '降序'} · 耗时 ms`"
-      description="按集合、操作类型、查询模式分组，按出现次数选取前 50 组。点击表头仅调整这 50 组的显示顺序，缺失值始终置后。每组独立保留最慢的一条原始日志。" />
-    <p v-if="!rows.length" class="empty-state">{{ patterns == null ? '此历史任务未保存新版模式统计，请重新上传分析' : '暂无可识别的查询模式' }}</p>
+      description="按集合、操作类型、查询模式分组，按出现次数选取前 50 组。搜索与筛选仅作用于已入选的 50 组，多项条件同时满足才显示。点击表头调整显示顺序，缺失值始终置后。每组独立保留最慢的一条原始日志。" />
+    <template v-if="topPatterns.length">
+      <div class="pattern-filters">
+        <label><span>集合／查询模式</span><input v-model="keyword" type="search" aria-label="搜索集合或查询模式" placeholder="输入集合名或查询字段" /></label>
+        <label><span>操作类型</span><select v-model="operation" aria-label="筛选操作类型">
+          <option value="">全部操作</option><option v-for="item in operations" :key="item" :value="item">{{ item }}</option>
+        </select></label>
+        <label><span>执行计划</span><input v-model="plan" type="search" aria-label="搜索执行计划" placeholder="例如 COLLSCAN、IXSCAN" /></label>
+        <button type="button" class="filter-reset" aria-label="重置查询模式筛选" :disabled="!hasFilters" @click="resetFilters">重置</button>
+      </div>
+      <p class="section-note filter-status" role="status">显示 {{ rows.length }} / {{ topPatterns.length }} 组 · 仅筛选已入选 Top 50</p>
+    </template>
+    <p v-if="!rows.length" class="empty-state">{{ patterns == null ? '此历史任务未保存新版模式统计，请重新上传分析' : topPatterns.length ? '已入选 Top 50 中没有匹配的查询模式，请调整筛选条件' : '暂无可识别的查询模式' }}</p>
     <div v-else class="data-table-scroll pattern-scroll">
       <table class="data-table pattern-table"><thead><tr>
         <th v-for="(column, index) in columns" :key="column.label" :class="{ 'numeric-column': index >= 4 && index <= 9 }"
@@ -74,6 +106,15 @@ const sortLabel = computed(() => columns[keys.indexOf(sortKey.value)].label)
 </template>
 
 <style scoped>
+.pattern-filters { display: flex; flex-wrap: wrap; align-items: end; gap: 10px; flex-shrink: 0; }
+.pattern-filters label { display: flex; flex: 1 1 160px; flex-direction: column; gap: 5px; min-width: 0; color: #526b66; font-size: 12px; }
+.pattern-filters label:first-child { flex: 1.5 1 180px; }
+.pattern-filters label:nth-child(2) { flex: .6 1 110px; }
+.pattern-filters input, .pattern-filters select, .filter-reset { box-sizing: border-box; height: 32px; min-width: 0; padding: 0 9px; border: 1px solid #d7e0e5; border-radius: 5px; color: #42576a; background: #fff; font: inherit; }
+.pattern-filters input:focus-visible, .pattern-filters select:focus-visible, .filter-reset:focus-visible { outline: 2px solid #91b5a3; outline-offset: 2px; }
+.filter-reset { cursor: pointer; font-size: 12px; }
+.filter-reset:disabled { color: #9ca8b4; cursor: default; }
+.filter-status { margin: 8px 0 12px; flex-shrink: 0; }
 .pattern-scroll { max-height: 360px; }
 .pattern-table { min-width: 1360px; }
 .column-heading { display: flex; align-items: center; gap: 5px; }

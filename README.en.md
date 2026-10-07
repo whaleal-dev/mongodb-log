@@ -19,6 +19,7 @@ See the [English User Guide](docs/user-guide.en.md) for complete operating instr
 - Calculates eight latency buckets from every detected slow query rather than sampling the retained Top 5,000.
 - Retains the globally slowest 5,000 records plus one independent slowest sample for each selected Top 50 query pattern. Ordinary raw lines are not persisted; runtime diagnostics keep at most three sanitized message samples per event category.
 - Summarizes failed operations, operation types, namespaces, query patterns, plans, clients, CPU time, response sizes, and hourly connections when available.
+- Filters the selected Top 50 query patterns by namespace or pattern text, operation type, and execution plan, while retaining column sorting and independent slowest samples.
 - Provides separate runtime diagnostics for anomaly timelines, connections and authentication, client applications and drivers, replica-set and network events, slow-query efficiency signals, and structured-field coverage.
 - Exports a sanitized Markdown report for human review or optional secondary analysis with an AI tool.
 - Supports chart/table switching, scatter zooming and selection, and a detailed side panel for retained slow queries.
