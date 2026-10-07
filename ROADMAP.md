@@ -38,6 +38,7 @@
 - 已实现 macOS、Linux、Windows 启动脚本，统一使用 `-Xms128m -Xmx2g`。
 - 已实现 Vue 前端随 Maven 构建打入可执行 Spring Boot JAR。
 - 已实现非 root、多阶段 Docker 镜像，并以 `whaleal/mongodb-log-analyzer` 在 Docker Hub 公开发布 `linux/amd64` 与 `linux/arm64` 双架构的 `0.1.0` 和 `latest` 标签。
+- 已为查询模式筛选版本重制 `MongoDB-Log-Analyzer-20261007` 桌面启动包与 ZIP，并在本机生成 `whaleal/mongodb-log-analyzer:local-20261007` 双架构镜像；两种架构均完成容器启动验收。
 - 已提供中英文项目介绍、中英文用户指南和页面内使用说明。
 - 已提供详细项目设计文档，覆盖架构、数据流、全部现行功能、核心算法、接口、资源边界、隐私边界和验证体系。
 - 已提供 AI 二次改写指南，固定必读顺序、公开能力边界、不可破坏约束、分任务改写流程、验证矩阵和可复用提示词。
@@ -58,6 +59,8 @@
 
 ## 最近验证
 
+- 2026-10-07：现有 Dockerfile 成功重制并加载 `whaleal/mongodb-log-analyzer:local-20261007` 本地镜像，包含 `linux/amd64` 与 `linux/arm64`，清单摘要为 `sha256:90bee27f7d1e6a71f3ce05e76c8610b5feeaca0e84bb2d84ad4fdd58b9734336`。两架构的构建内前后端测试通过，后端各 107 项零失败、2 项真实样本按条件跳过；逐架构临时容器验收确认运行 UID 为 10001、JVM 最大堆为 2 GB、首页与新版筛选静态资源正常、任务接口可用。验收容器仅绑定本机端口，完成后已停止。
+- 2026-10-07：查询模式筛选功能以 `8f71368` 提交并推送到 GitHub `main`。已重制 `MongoDB-Log-Analyzer-20261007` 启动目录与 ZIP，包含已验证 JAR、三平台入口、原版启动脚本、使用说明、许可证及 JAR SHA-256；压缩完整性、可执行权限、脚本语法与新版静态资源核对通过。桌面新目录不覆盖旧启动包或旧数据；通过实际 macOS 入口启动，首页正常，内存接口确认最大堆为 2 GB，验收数据使用独立临时目录。
 - 2026-10-07：新增 4 项查询模式筛选回归测试，先确认 3 项因功能缺失失败，再完成实现；前端 15 个测试文件、53 项测试全部通过。`mvn test` 与 Java 17 下的 `mvn clean package` 均通过，后端 107 项测试零失败、2 项真实 FTDC 样本测试按环境条件跳过；`npm run build` 成功，JAR 静态资源与本次前端构建逐项一致。使用独立临时数据目录完成浏览器上传、进度、结果页与详情验收：混合旧版文本、JSON、GZip 共 11 行，9 条慢查询、5 组模式，1 条异常与 1 条空行正确披露；组合筛选得到预期 1 组，无匹配、重置、排序、独立样本、任务重开清空及 386px 窄面板布局均通过，浏览器无警告或错误。中英文 README、使用指南与设计文档同步更新，文档相对链接、代码围栏及 `git diff --check` 通过。
 - 2026-09-30：新增 `Dockerfile` 与 `.dockerignore`；镜像构建内前端 14 个测试文件、49 项测试全部通过，后端 107 项测试零失败、2 项真实样本按环境条件跳过。`linux/arm64` 容器以非 root 用户启动，首页与内存接口冒烟通过，JVM 堆上限为 2 GB；Docker Hub 已以 `whaleal/mongodb-log-analyzer` 公开发布 `0.1.0` 与 `latest`，两者均包含 `linux/amd64`、`linux/arm64`，清单摘要为 `sha256:c49996ea14d1781d8f4fff1cf4d5ea4a2e7c4b41920aaa67b01f67d2ffb3daf2`。
 - 2026-09-30：新增 `docs/design.md` 与 `docs/ai-rewrite-guide.md`，统一中英文 AI 编程与验证说明，并逐项核对 Controller 路由、任务生命周期、解析与聚合常量、FTDC 索引和查询边界、前端公开入口及测试覆盖；全仓 Markdown 相对链接有效，代码围栏成对，`git diff --check` 通过。本轮仅修改文档，未重复运行后端和前端业务测试。
