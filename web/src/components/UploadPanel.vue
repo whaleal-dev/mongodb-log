@@ -56,7 +56,7 @@ async function submit() {
       </el-upload>
       </div>
       <div class="form-action">
-        <el-button type="success" :loading="submitting" @click="submit">开始分析</el-button>
+        <el-button type="primary" :loading="submitting" @click="submit">开始分析</el-button>
       </div>
     </div>
   </section>

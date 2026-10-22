@@ -1,4 +1,5 @@
 import { flushPromises, mount } from '@vue/test-utils'
+import ElementPlus from 'element-plus'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import AuthorPromotionDialog from '../src/components/AuthorPromotionDialog.vue'
 import App from '../src/App.vue'
@@ -16,7 +17,7 @@ async function open() {
 }
 
 function shown() {
-  const dialog = wrapper.find('[role="dialog"]')
+  const dialog = wrapper.find('.author-promotion-dialog')
   return dialog.exists() && dialog.isVisible()
 }
 
@@ -93,7 +94,7 @@ describe('author promotion', () => {
 
   it('places the about button in the header for both workspaces and does not reopen on switching', async () => {
     vi.spyOn(window, 'fetch').mockResolvedValue({ ok: true, text: async () => '[]' })
-    wrapper = mount(App, { attachTo: document.body, global: { stubs: {
+    wrapper = mount(App, { attachTo: document.body, global: { plugins: [ElementPlus], stubs: {
       teleport: true, MemoryOrb: true, FtdcWorkspace: true, UploadPanel: true, TaskList: true,
     } } })
     await flushPromises()

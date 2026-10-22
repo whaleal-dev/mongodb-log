@@ -4,7 +4,9 @@ import AnalysisChart from './AnalysisChart.vue'
 import MetricHeader from './MetricHeader.vue'
 import { formatDate, formatDecimal } from '../utils/format.js'
 import MetricPanel from './MetricPanel.vue'
+import { useColorTheme } from '../ui/colorTheme.js'
 const props = defineProps({ samples: { type: Array, default: null } })
+const { tokens } = useColorTheme()
 const view = ref('chart')
 const points = computed(() => {
   const sorted = [...(props.samples || [])].sort((a, b) => a.timestampEpochMillis - b.timestampEpochMillis)
@@ -18,7 +20,7 @@ const points = computed(() => {
   return result
 })
 const option = computed(() => ({
-  color: ['#649bb8'],
+  color: [tokens.value['--primary-mark']],
   tooltip: { trigger: 'axis', renderMode: 'richText', formatter: (items) => {
     const point = items[0]?.value
     return point ? formatDate(point[0]) + '\n平均连接数：' + (point[1] == null ? '无样本' : formatDecimal(point[1])) : ''

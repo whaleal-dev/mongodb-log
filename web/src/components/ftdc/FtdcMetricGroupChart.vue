@@ -1,6 +1,7 @@
 <script setup>
 import { computed, ref, watch } from 'vue'
 import AnalysisChart from '../AnalysisChart.vue'
+import { useColorTheme } from '../../ui/colorTheme.js'
 
 const props = defineProps({
   group: { type: Object, required: true },
@@ -10,6 +11,7 @@ const props = defineProps({
 const collapsed = ref(false)
 const split = ref(false)
 const hideZero = ref(false)
+const { tokens } = useColorTheme()
 const colors = ['#347961', '#3b82a0', '#c26b3d', '#7c5cb2', '#a05b75', '#718548', '#526b8f', '#aa7d28']
 
 watch(() => props.collapseCommand, command => { if (command) collapsed.value = command.value }, { immediate: true })
@@ -41,13 +43,14 @@ function chartPoints(series) {
   return (series.timestamps || []).map((timestamp, index) => [timestamp, series.values[index]])
 }
 
-function chartSeries(series, index) {
+function chartSeries(series) {
   return {
     name: series.path,
     type: 'line',
     showSymbol: false,
     connectNulls: false,
-    itemStyle: { color: colors[index % colors.length] },
+    itemStyle: { color: props.group.series.length === 1 ? tokens.value['--primary-mark']
+      : colors[props.group.series.indexOf(series) % colors.length] },
     data: chartPoints(series),
   }
 }
@@ -55,7 +58,7 @@ function chartSeries(series, index) {
 function option(seriesList) {
   return {
     animation: false,
-    color: colors,
+    color: props.group.series.length === 1 ? [tokens.value['--primary-mark']] : colors,
     grid: { left: 70, right: 24, top: seriesList.length > 1 ? 52 : 24, bottom: 55 },
     legend: seriesList.length > 1 ? { type: 'scroll', top: 4, left: 16, right: 16 } : undefined,
     tooltip: {
@@ -118,5 +121,5 @@ const combinedOption = computed(() => option(visibleEntries.value.map(entry => e
 </template>
 
 <style scoped>
-.group-chart-card{width:100%;min-width:0;border:1px solid #dce6ef;border-radius:12px;background:#f9fbfc;overflow:hidden}.group-header{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:12px 14px;border-bottom:1px solid #e4ebf1;background:#fff}.group-header h3{margin:0;color:#34495a;font-size:14px;font-weight:600;overflow-wrap:anywhere}.group-header span{display:block;margin-top:4px;color:#8795a1;font-size:11px}.group-actions{display:flex;flex-wrap:wrap;gap:7px}.group-actions button{padding:4px 10px;border:1px solid #d5e1e9;border-radius:6px;color:#4c6d63;background:#fff;font-size:12px;cursor:pointer}.group-actions button.active{border-color:#72a08d;background:#eaf4ef;color:#225f47}.group-actions button:disabled{cursor:not-allowed;opacity:.45}.chart-body{display:grid;grid-template-columns:300px minmax(0,1fr);gap:12px;padding:12px}.metric-info-list{display:flex;flex-direction:column;gap:4px;max-height:320px;overflow:auto}.metric-info-item{display:block;width:100%;padding:9px 10px;border:1px solid #dce6ef;border-radius:8px;background:#fff;text-align:left}.metric-name{display:block;color:#3c5362;font-size:11px;font-weight:600;overflow-wrap:anywhere}.metric-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:9px}.metric-stats span{color:#81909c;font-size:9px}.metric-stats strong{display:block;margin-top:2px;color:#405563;font-size:10px;overflow-wrap:anywhere}.chart-render-area{min-width:0;width:100%;min-height:320px;padding:8px;border-radius:8px;background:#fff}.split-chart-list{display:flex;flex-direction:column;gap:14px}.split-chart-item{border-bottom:1px solid #edf1f4}.split-chart-item:last-child{border-bottom:0}.split-chart-item h4{margin:4px 8px;color:#506473;font-size:11px;font-weight:600;overflow-wrap:anywhere}.empty-chart{display:flex;min-height:300px;align-items:center;justify-content:center;margin:0;color:#8a98a4;font-size:12px}@media(max-width:1000px){.chart-body{grid-template-columns:1fr}.metric-info-list{max-height:180px}}@media(max-width:620px){.group-header{align-items:flex-start;flex-direction:column}.metric-stats{grid-template-columns:1fr 1fr}}
+.group-chart-card{width:100%;min-width:0;border:1px solid #dce6ef;border-radius:12px;background:#f9fbfc;overflow:hidden}.group-header{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:12px 14px;border-bottom:1px solid #e4ebf1;background:#fff}.group-header h3{margin:0;color:#34495a;font-size:14px;font-weight:600;overflow-wrap:anywhere}.group-header span{display:block;margin-top:4px;color:#8795a1;font-size:11px}.group-actions{display:flex;flex-wrap:wrap;gap:7px}.group-actions button{padding:4px 10px;border:1px solid #d5e1e9;border-radius:6px;color:#4c6d63;background:#fff;font-size:12px;cursor:pointer}.group-actions button.active{border-color:var(--primary-line);background:var(--primary-soft);color:var(--primary-text)}.group-actions button:disabled{cursor:not-allowed;opacity:.45}.chart-body{display:grid;grid-template-columns:300px minmax(0,1fr);gap:12px;padding:12px}.metric-info-list{display:flex;flex-direction:column;gap:4px;max-height:320px;overflow:auto}.metric-info-item{display:block;width:100%;padding:9px 10px;border:1px solid #dce6ef;border-radius:8px;background:#fff;text-align:left}.metric-name{display:block;color:#3c5362;font-size:11px;font-weight:600;overflow-wrap:anywhere}.metric-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:9px}.metric-stats span{color:#81909c;font-size:9px}.metric-stats strong{display:block;margin-top:2px;color:#405563;font-size:10px;overflow-wrap:anywhere}.chart-render-area{min-width:0;width:100%;min-height:320px;padding:8px;border-radius:8px;background:#fff}.split-chart-list{display:flex;flex-direction:column;gap:14px}.split-chart-item{border-bottom:1px solid #edf1f4}.split-chart-item:last-child{border-bottom:0}.split-chart-item h4{margin:4px 8px;color:#506473;font-size:11px;font-weight:600;overflow-wrap:anywhere}.empty-chart{display:flex;min-height:300px;align-items:center;justify-content:center;margin:0;color:#8a98a4;font-size:12px}@media(max-width:1000px){.chart-body{grid-template-columns:1fr}.metric-info-list{max-height:180px}}@media(max-width:620px){.group-header{align-items:flex-start;flex-direction:column}.metric-stats{grid-template-columns:1fr 1fr}}
 </style>

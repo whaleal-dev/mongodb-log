@@ -16,6 +16,11 @@ import MemoryOrb from './components/MemoryOrb.vue'
 import DiagnosticWorkspace from './components/DiagnosticWorkspace.vue'
 import UsageGuideDialog from './components/UsageGuideDialog.vue'
 import AuthorPromotionDialog from './components/AuthorPromotionDialog.vue'
+import ThemeSettings from './components/ThemeSettings.vue'
+import { initializeColorTheme } from './ui/colorTheme.js'
+
+const stopTheme = initializeColorTheme()
+onBeforeUnmount(stopTheme)
 
 const workspaceModeStorageKey = 'mongodb-log:workspace-mode:v1'
 
@@ -237,7 +242,7 @@ onBeforeUnmount(() => { stopPolling(); ++listVersion; ++summaryVersion; ++diagno
         <button type="button" :class="{ active: workspaceMode === 'logs' }" @click="selectWorkspaceMode('logs')">MongoDB Log</button>
         <button type="button" :class="{ active: workspaceMode === 'ftdc' }" @click="selectWorkspaceMode('ftdc')">MongoDB Metric</button>
       </nav>
-      <div class="header-actions"><UsageGuideDialog /><AuthorPromotionDialog /><div class="offline-state">本地工作区</div><MemoryOrb @cleared="dataCleared" /></div>
+      <div class="header-actions"><ThemeSettings /><UsageGuideDialog /><AuthorPromotionDialog /><div class="offline-state">本地工作区</div><MemoryOrb @cleared="dataCleared" /></div>
     </header>
 
     <main class="page-container">
@@ -321,11 +326,6 @@ onBeforeUnmount(() => { stopPolling(); ++listVersion; ++summaryVersion; ++diagno
 
 <style>
 :root {
-  --el-color-primary: #347961;
-  --el-color-primary-light-3: #70a18e;
-  --el-color-primary-light-5: #aac8bb;
-  --el-color-primary-light-7: #d0e3da;
-  --el-color-primary-light-9: #eff6f2;
   --el-color-success: #4f9477;
   --el-border-radius-base: 7px;
   --text: #344455;
@@ -346,7 +346,7 @@ button, input { font: inherit; }
 .header-actions { display: flex; align-items: center; gap: 12px; }
 .workspace-switch { display: flex; align-items: center; gap: 4px; padding: 3px; border: 1px solid #dce3e8; border-radius: 6px; background: #f7f9fa; }
 .workspace-switch button { padding: 5px 12px; border: 0; border-radius: 4px; color: #64748b; background: transparent; font-size: 12px; cursor: pointer; }
-.workspace-switch button.active { color: #215c44; background: #fff; box-shadow: 0 1px 3px #dbe3e0; }
+.workspace-switch button.active { color: var(--primary-text); background: #fff; box-shadow: 0 1px 3px #dbe3e0; }
 .page-container { max-width: 1600px; margin: 0 auto; padding: 24px 28px 40px; }
 .workspace-card { min-width: 0; border: 0; border-radius: 0; background: transparent; overflow: visible; }
 .workspace-card > .el-card__body { padding: 0; }
@@ -357,7 +357,7 @@ button, input { font: inherit; }
 .page-title p, .detail-title p { margin: 7px 0 0; color: #64748b; font-size: 12px; }
 .detail-header { margin-bottom: 18px; }
 .back-button { display: inline-block; padding: 0; margin-bottom: 15px; border: 0; color: #7b8d8a; background: transparent; font-size: 12px; cursor: pointer; }
-.back-button:hover { color: #347961; }
+.back-button:hover { color: var(--primary-text); }
 .task-overview { display: grid; grid-template-columns: 1.4fr .65fr 1.6fr; gap: 16px; margin-bottom: 16px; padding: 15px 18px; border: 1px solid #dce3e8; border-radius: 5px; background: #fff; }
 .task-overview > div { min-width: 0; }
 .task-overview span, .task-overview strong { display: block; }
@@ -370,9 +370,9 @@ button, input { font: inherit; }
 .result-navigation { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding-bottom: 2px; border-bottom: 1px solid #dce3e8; }
 .result-tabs { display: flex; align-items: center; gap: 4px; }
 .result-tabs button { margin-bottom: -3px; padding: 9px 12px; border: 0; border-bottom: 2px solid transparent; color: #64748b; background: transparent; font-size: 12px; cursor: pointer; }
-.result-tabs button.active { color: #215c44; border-bottom-color: #347961; font-weight: 600; }
-.report-button { padding: 7px 12px; border: 1px solid #aac8bb; border-radius: 5px; color: #215c44; background: #eff6f2; font-size: 12px; cursor: pointer; }
-.report-button:hover { background: #e2f0e9; }.report-button:disabled { cursor: wait; opacity: .65; }
+.result-tabs button.active { color: var(--primary-text); border-bottom-color: var(--primary-mark); font-weight: 600; }
+.report-button { padding: 7px 12px; border: 1px solid var(--primary-line); border-radius: 5px; color: var(--primary-text); background: var(--primary-soft); font-size: 12px; cursor: pointer; }
+.report-button:hover { background: var(--primary-soft-hover); }.report-button:disabled { cursor: wait; opacity: .65; }
 .request-error { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px; color: #9c472c; background: #fff7ed; }
 .parse-notice { padding: 12px 16px; border: 1px solid #e8d9bd; border-radius: 4px; background: #fffbf2; color: #785a28; font-size: 12px; line-height: 1.8; }
 .parse-notice summary { cursor: pointer; font-weight: 500; }
@@ -392,10 +392,53 @@ button, input { font: inherit; }
 .data-table tbody tr:last-child td { border-bottom: 0; }
 .data-table tbody tr:hover td { background: #f8fafb; }
 .numeric-table th:nth-child(n+2), .numeric-table td:nth-child(n+2) { text-align: right; }
-.text-button { padding: 0; border: 0; color: #3e8066; background: transparent; font-size: 12px; cursor: pointer; }
-.text-button:hover { color: #215c44; }
+.text-button { padding: 0; border: 0; color: var(--primary-text); background: transparent; font-size: 12px; cursor: pointer; }
+.text-button:hover { color: var(--primary-text); text-decoration: underline; }
 .metric-help-tooltip { max-width: 340px; padding: 12px 14px !important; font-size: 12px !important; line-height: 1.8 !important; }
-.el-button { font-weight: 450; }
+.el-button { --el-button-outline-color: var(--focus-color); font-weight: 450; }
+.el-button--primary {
+  --el-button-text-color: var(--primary-contrast);
+  --el-button-bg-color: var(--primary);
+  --el-button-border-color: var(--primary-mark);
+  --el-button-hover-text-color: var(--primary-contrast);
+  --el-button-hover-bg-color: var(--primary-hover);
+  --el-button-hover-border-color: var(--primary-mark);
+  --el-button-active-text-color: var(--primary-contrast);
+  --el-button-active-bg-color: var(--primary-active);
+  --el-button-active-border-color: var(--primary-mark);
+  --el-button-outline-color: var(--focus-color);
+  --el-button-disabled-text-color: var(--primary-disabled-contrast);
+  --el-button-disabled-bg-color: var(--primary-disabled);
+  --el-button-disabled-border-color: var(--primary-line);
+}
+.el-button--primary.is-plain {
+  --el-button-text-color: var(--primary-text);
+  --el-button-bg-color: var(--primary-soft);
+  --el-button-border-color: var(--primary-line);
+  --el-button-hover-text-color: var(--primary-text);
+  --el-button-hover-bg-color: var(--primary-soft-hover);
+  --el-button-hover-border-color: var(--primary-mark);
+  --el-button-active-text-color: var(--primary-text);
+  --el-button-active-bg-color: var(--primary-soft-hover);
+}
+.el-button--primary.is-link, .el-button--primary.is-text {
+  --el-button-text-color: var(--primary-text);
+  --el-button-hover-text-color: var(--primary-text);
+  --el-button-active-text-color: var(--primary-text);
+  --el-button-hover-link-text-color: var(--primary-text);
+  --el-button-active-color: var(--primary-text);
+}
+.el-button--primary.is-plain.is-disabled, .el-button--primary.is-plain.is-disabled:hover,
+.el-button--primary.is-link.is-disabled, .el-button--primary.is-link.is-disabled:hover,
+.el-button--primary.is-text.is-disabled, .el-button--primary.is-text.is-disabled:hover {
+  color: var(--primary-text);
+  background-color: var(--primary-soft);
+  border-color: var(--primary-line);
+}
+button:focus-visible, .el-button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible, .el-select__wrapper.is-focused {
+  outline: 2px solid var(--focus-color);
+  outline-offset: 2px;
+}
 .el-tag { border-radius: 5px; font-size: 11px; }
 @media (max-width: 900px) {
   .page-container { padding: 22px 18px 36px; }

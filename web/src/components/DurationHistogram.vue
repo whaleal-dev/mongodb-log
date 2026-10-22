@@ -4,12 +4,14 @@ import AnalysisChart from './AnalysisChart.vue'
 import MetricHeader from './MetricHeader.vue'
 import { formatDecimal, formatPercent } from '../utils/format.js'
 import MetricPanel from './MetricPanel.vue'
+import { useColorTheme } from '../ui/colorTheme.js'
 
 const props = defineProps({ buckets: { type: Array, default: () => [] } })
+const { tokens } = useColorTheme()
 const view = ref('chart')
 const hasData = computed(() => props.buckets.some((bucket) => bucket.count > 0))
 const option = computed(() => ({
-  color: ['#4c947d'],
+  color: [tokens.value['--primary-mark']],
   grid: { left: 55, right: 24, top: 30, bottom: 48 },
   tooltip: { trigger: 'axis', renderMode: 'richText', formatter: (items) => {
     const bucket = props.buckets[items[0].dataIndex]

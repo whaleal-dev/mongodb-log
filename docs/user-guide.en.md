@@ -85,6 +85,14 @@ Clearing site data, changing browsers, or using a different application address 
 
 To stop the application, close the launcher window or press `Ctrl+C` in its terminal. If the process exits during Log analysis or Metric indexing, the interrupted task is marked as failed after the next startup and is not resumed. Working copies may remain; delete the failed task from its task list, then upload the files again.
 
+### Theme color
+
+Click `主题色` (Theme color) at the top right to choose one of four presets: `MongoDB 绿`, `经典蓝`, `雾岚紫`, or `石墨灰`. You can also use the color picker or enter a six-digit HEX color such as `#347961`. Valid colors apply immediately and are saved in the current browser. Incomplete or invalid input keeps the current theme; leaving the field or pressing Enter shows a format error.
+
+`完成` (Done) and closing the dialog only close the settings; they do not undo the applied color. `恢复默认` (Restore default) immediately restores the default green. If saving fails, the preview remains active and `重试保存` (Retry save) tries again. The preference belongs to the current browser and application address, is separate from task data, and resets when site data is cleared.
+
+The page remains light. Success, error, warning, memory-alert, and multi-series category colors are independent of the theme. The color algorithm targets `4.5:1` for covered theme text and primary-button text, and `3:1` for focus indicators and single-series chart marks. These targets are not a site-wide accessibility audit or certification.
+
 ## 4. Use the MongoDB Log Workspace
 
 ### 4.1 Create an analysis task

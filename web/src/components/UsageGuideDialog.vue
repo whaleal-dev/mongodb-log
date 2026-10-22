@@ -86,17 +86,17 @@ onBeforeUnmount(() => window.removeEventListener('keydown', onKeydown))
 
 <style scoped>
 .usage-guide-button { padding: 5px 10px; border: 1px solid #d7e0e5; border-radius: 5px; color: #526b66; background: #fff; font-size: 12px; cursor: pointer; }
-.usage-guide-button:hover { border-color: #8db4a4; color: #215c44; background: #f5faf7; }
+.usage-guide-button:hover { border-color: var(--primary-line); color: var(--primary-text); background: var(--primary-soft); }
 .guide-overlay { position: fixed; inset: 0; z-index: 2000; display: grid; place-items: center; padding: 24px; background: rgba(28, 39, 48, .46); }
 .guide-dialog { display: flex; flex-direction: column; width: min(960px, 100%); max-height: min(820px, calc(100vh - 48px)); overflow: hidden; border-radius: 10px; background: #fff; box-shadow: 0 24px 70px rgba(22, 36, 44, .24); }
 .guide-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 20px; padding: 20px 24px 17px; border-bottom: 1px solid #e2e8ec; }
 .guide-header h2 { margin: 0; color: #253b37; font-size: 20px; font-weight: 650; }
 .guide-header p { margin: 5px 0 0; color: #7b8b96; font-size: 12px; }
 .guide-close { width: 30px; height: 30px; padding: 0; border: 0; border-radius: 5px; color: #6f7f89; background: transparent; font-size: 23px; line-height: 28px; cursor: pointer; }
-.guide-close:hover { color: #334b46; background: #f0f4f3; }
+.guide-close:hover { color: var(--primary-text); background: var(--primary-soft); }
 .guide-content { overflow: auto; padding: 20px 24px 22px; }
-.guide-intro { padding: 13px 15px; border-left: 3px solid #5c9b7f; background: #f4f9f6; }
-.guide-intro strong { color: #315f4e; font-size: 13px; }
+.guide-intro { padding: 13px 15px; border-left: 3px solid var(--primary-line); background: var(--primary-soft); }
+.guide-intro strong { color: var(--primary-text); font-size: 13px; }
 .guide-intro p { margin: 5px 0 0; color: #536a63; font-size: 12px; line-height: 1.75; }
 .guide-columns { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 18px; }
 .guide-section { min-width: 0; }
@@ -108,9 +108,9 @@ onBeforeUnmount(() => window.removeEventListener('keydown', onKeydown))
 .limit-grid > div { padding: 12px 14px; border-right: 1px solid #e3e9ed; border-bottom: 1px solid #e3e9ed; }
 .limit-grid strong { color: #465d58; font-size: 12px; }
 .limit-grid p { margin: 4px 0 0; color: #657580; font-size: 11px; line-height: 1.7; }
-.guide-dialog code { padding: 1px 4px; border-radius: 3px; color: #355c4c; background: #edf4f0; font-family: ui-monospace, SFMono-Regular, Consolas, monospace; font-size: .95em; }
+.guide-dialog code { padding: 1px 4px; border-radius: 3px; color: var(--primary-text); background: var(--primary-soft); font-family: ui-monospace, SFMono-Regular, Consolas, monospace; font-size: .95em; }
 .guide-footer { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 13px 24px; border-top: 1px solid #e2e8ec; color: #7b8b96; background: #fafbfc; font-size: 11px; }
-.guide-footer button { padding: 7px 18px; border: 1px solid #347961; border-radius: 5px; color: #fff; background: #347961; font-size: 12px; cursor: pointer; }
+.guide-footer button { padding: 7px 18px; border: 1px solid var(--primary); border-radius: 5px; color: var(--primary-contrast); background: var(--primary); font-size: 12px; cursor: pointer; }
 @media (max-width: 720px) {
   .guide-overlay { padding: 12px; }
   .guide-dialog { max-height: calc(100vh - 24px); }

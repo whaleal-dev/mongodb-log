@@ -35,7 +35,7 @@ async function submit() {
           <template #tip><span class="section-note">按内容识别，不要求固定扩展名</span></template>
         </el-upload>
       </div>
-      <el-button type="success" :loading="submitting" @click="submit">开始建立索引</el-button>
+      <el-button type="primary" :loading="submitting" @click="submit">开始建立索引</el-button>
     </div>
   </section>
 </template>

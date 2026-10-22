@@ -54,16 +54,16 @@ const logFields = [
 
 <style scoped>
 .selected-detail { min-width: 0; }
-.query-overview { color: #305e4c; padding: 12px 14px; background: #eff6f2; border-radius: 8px; font-size: 13px; line-height: 1.8; overflow-wrap: anywhere; }
+.query-overview { color: var(--primary-text); padding: 12px 14px; background: var(--primary-soft); border-radius: 8px; font-size: 13px; line-height: 1.8; overflow-wrap: anywhere; }
 .detail-note { color: #8a97a4; font-size: 12px; line-height: 1.8; }
 .interpreted-metrics { border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
 .interpreted-row { padding: 13px 15px; border-bottom: 1px solid var(--line); }
 .interpreted-row:last-child { border-bottom: 0; }
 .interpreted-row > div { display: flex; justify-content: space-between; gap: 16px; font-size: 12px; }
-.interpreted-row strong { color: #356c55; font-weight: 550; text-align: right; overflow-wrap: anywhere; max-width: 65%; }
+.interpreted-row strong { color: var(--primary-text); font-weight: 550; text-align: right; overflow-wrap: anywhere; max-width: 65%; }
 .interpreted-row p, .query-observations p { margin: 7px 0 0; color: #7c8c99; font-size: 12px; line-height: 1.8; }
 .interpreted-row code { color: #a0abb6; font: 10px/1.7 ui-monospace, monospace; overflow-wrap: anywhere; }
-.query-observations > div { padding: 12px 14px; margin-bottom: 8px; background: #f8fafb; border-left: 2px solid #9ebead; }
+.query-observations > div { padding: 12px 14px; margin-bottom: 8px; background: #f8fafb; border-left: 2px solid var(--primary-line); }
 .query-observations h4 { margin: 0; font-size: 12px; font-weight: 550; }
 .detail-fields th { width: 130px; }
 .detail-fields td { white-space: pre-wrap; }

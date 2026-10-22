@@ -104,26 +104,26 @@ onBeforeUnmount(() => {
 
 <style scoped>
 .about-author-button { padding: 5px 10px; border: 1px solid #d7e0e5; border-radius: 5px; color: #526b66; background: #fff; font-size: 12px; white-space: nowrap; cursor: pointer; }
-.about-author-button:hover { border-color: #8db4a4; color: #215c44; background: #f5faf7; }
+.about-author-button:hover { border-color: var(--primary-line); color: var(--primary-text); background: var(--primary-soft); }
 .promotion-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; }
-.promotion-badge { display: block; margin-bottom: 8px; color: #347961; font-size: 11px; font-weight: 600; letter-spacing: 2px; }
+.promotion-badge { display: block; margin-bottom: 8px; color: var(--primary-text); font-size: 11px; font-weight: 600; letter-spacing: 2px; }
 .promotion-title { color: #253b37; font-size: 22px; font-weight: 650; line-height: 1.4; }
 .promotion-close { flex-shrink: 0; width: 30px; height: 30px; border: 0; border-radius: 5px; color: #6f7f89; background: transparent; font-size: 24px; line-height: 1; cursor: pointer; }
-.promotion-close:hover { color: #334b46; background: #f0f4f3; }
+.promotion-close:hover { color: var(--primary-text); background: var(--primary-soft); }
 .promotion-intro { margin: 10px 0 20px; color: #657580; font-size: 13px; line-height: 1.7; }
 .promotion-links { display: flex; flex-direction: column; gap: 12px; }
-.promotion-links a { display: flex; align-items: flex-start; gap: 14px; padding: 16px; border: 1px solid #dce6e1; border-radius: 8px; color: inherit; background: #f8fbf9; text-decoration: none; }
-.promotion-links a:hover { border-color: #83ae9b; background: #f0f7f3; }
-.promotion-number { flex-shrink: 0; display: grid; place-items: center; width: 34px; height: 34px; border-radius: 7px; color: #347961; background: #e7f1eb; font: 12px ui-monospace, SFMono-Regular, Consolas, monospace; }
+.promotion-links a { display: flex; align-items: flex-start; gap: 14px; padding: 16px; border: 1px solid var(--primary-line); border-radius: 8px; color: inherit; background: var(--primary-soft); text-decoration: none; }
+.promotion-links a:hover { border-color: var(--primary-mark); background: var(--primary-soft-hover); }
+.promotion-number { flex-shrink: 0; display: grid; place-items: center; width: 34px; height: 34px; border-radius: 7px; color: var(--primary-text); background: var(--primary-soft-hover); font: 12px ui-monospace, SFMono-Regular, Consolas, monospace; }
 .promotion-link-text { flex: 1; min-width: 0; overflow-wrap: anywhere; }
 .promotion-link-text strong { color: #2d4e40; font-size: 14px; }
 .promotion-link-text p { margin: 6px 0; color: #657580; font-size: 12px; line-height: 1.6; }
-.promotion-link-text > span { color: #347961; font: 11px ui-monospace, SFMono-Regular, Consolas, monospace; }
-.promotion-arrow { color: #60957d; font-size: 18px; }
+.promotion-link-text > span { color: var(--primary-text); font: 11px ui-monospace, SFMono-Regular, Consolas, monospace; }
+.promotion-arrow { color: var(--primary-text); font-size: 18px; }
 .promotion-footer { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-top: 20px; }
 .promotion-footer > span { color: #7b8b96; font-size: 11px; }
-.promotion-footer button { padding: 9px 20px; border: 1px solid #347961; border-radius: 6px; color: #fff; background: #347961; font-size: 13px; cursor: pointer; white-space: nowrap; }
-.about-author-button:focus-visible, .promotion-links a:focus-visible, .promotion-close:focus-visible, .promotion-footer button:focus-visible { outline: 2px solid #347961; outline-offset: 3px; }
+.promotion-footer button { padding: 9px 20px; border: 1px solid var(--primary); border-radius: 6px; color: var(--primary-contrast); background: var(--primary); font-size: 13px; cursor: pointer; white-space: nowrap; }
+.about-author-button:focus-visible, .promotion-links a:focus-visible, .promotion-close:focus-visible, .promotion-footer button:focus-visible { outline: 2px solid var(--focus-color); outline-offset: 3px; }
 @media (max-width: 480px) {
   .promotion-title { font-size: 20px; }
   .promotion-links a { gap: 10px; padding: 12px; }

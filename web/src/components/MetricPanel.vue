@@ -65,7 +65,7 @@ onBeforeUnmount(() => window.removeEventListener('mongodb-log:reset-layout', res
 .resizable-panel { position: relative; display: flex; flex-direction: column; min-width: min(280px, 100%); max-width: 100%; overflow: hidden; }
 .resizable-panel > .metric-header { flex-shrink: 0; }
 .panel-resize { position: absolute; right: 2px; bottom: 2px; width: 22px; height: 22px; padding: 0; border: 0; color: #aabbb4; background: transparent; cursor: nwse-resize; touch-action: none; font-size: 16px; }
-.panel-resize:hover, .panel-resize:focus-visible { color: #347961; background: #eff6f2; outline: 1px solid #9fbdaf; }
+.panel-resize:hover, .panel-resize:focus-visible { color: var(--primary-text); background: var(--primary-soft); outline: 1px solid var(--focus-color); }
 .panel-resize::after { content: ''; display: block; width: 7px; height: 7px; margin: 8px; border-right: 2px solid currentColor; border-bottom: 2px solid currentColor; }
 .resizable-panel.is-sized > .analysis-chart { flex: 1; height: auto !important; min-height: 80px; }
 .resizable-panel.is-sized > .data-table-scroll { flex: 1; min-height: 0; height: auto; max-height: none; }

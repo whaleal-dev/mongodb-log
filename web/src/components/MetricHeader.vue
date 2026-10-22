@@ -25,7 +25,7 @@ h2 { margin: 0; color: #253344; font-size: 14px; line-height: 1.5; font-weight: 
 p { margin: 4px 0 0; color: #64748b; font-size: 11px; line-height: 1.5; }
 .view-toggle { display: flex; flex-shrink: 0; gap: 2px; padding: 3px; border-radius: 7px; background: #f0f3f6; }
 .view-toggle button { border: 0; border-radius: 5px; padding: 5px 10px; color: #7a8798; background: transparent; font-size: 11px; cursor: pointer; white-space: nowrap; }
-.view-toggle .active { color: #285d4d; background: #fff; box-shadow: 0 1px 3px #233b4520; }
-.view-toggle button:focus-visible { outline: 2px solid #84b7a3; outline-offset: 1px; }
+.view-toggle .active { color: var(--primary-text); background: #fff; box-shadow: 0 1px 3px #233b4520; }
+.view-toggle button:focus-visible { outline: 2px solid var(--focus-color); outline-offset: 1px; }
 @media (max-width: 600px) { .metric-header { flex-wrap: wrap; } }
 </style>

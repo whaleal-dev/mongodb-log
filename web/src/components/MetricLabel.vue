@@ -15,5 +15,5 @@ defineProps({ label: String, description: String, helpOnly: Boolean })
 <style scoped>
 .metric-label { display: inline-flex; align-items: center; gap: 7px; max-width: 100%; }
 .metric-help { flex: 0 0 auto; display: inline-grid; place-items: center; padding: 0; width: 16px; height: 16px; border: 1px solid #bdc7d3; border-radius: 50%; color: #8391a2; background: transparent; font: 11px/1 Arial, sans-serif; cursor: help; }
-.metric-help:hover, .metric-help:focus-visible { color: #246853; border-color: #246853; background: #edf6f2; outline: 2px solid #dceee6; outline-offset: 2px; }
+.metric-help:hover, .metric-help:focus-visible { color: var(--primary-text); border-color: var(--primary-line); background: var(--primary-soft); outline: 2px solid var(--focus-color); outline-offset: 2px; }
 </style>

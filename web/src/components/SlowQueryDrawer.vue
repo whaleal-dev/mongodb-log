@@ -56,6 +56,6 @@ onBeforeUnmount(() => { ++requestVersion })
 <style>
 .query-drawer .el-drawer__header { margin-bottom: 0; padding: 22px 24px; border-bottom: 1px solid var(--line); color: #2a433b; font-weight: 650; }
 .query-drawer .el-drawer__body { padding: 0 24px 28px; }
-.sample-context { padding: 12px 14px; border-radius: 7px; color: #597669; background: #eff6f2; font-size: 12px; line-height: 1.7; }
+.sample-context { padding: 12px 14px; border-radius: 7px; color: var(--primary-text); background: var(--primary-soft); font-size: 12px; line-height: 1.7; }
 @media (max-width: 480px) { .query-drawer .el-drawer__body { padding: 0 16px 20px; } }
 </style>

@@ -1,8 +1,11 @@
 <script setup>
 import { computed } from 'vue'
 import AnalysisChart from '../AnalysisChart.vue'
+import { useColorTheme } from '../../ui/colorTheme.js'
 const props = defineProps({ series: { type: Object, default: () => ({ timestamps: [], values: [] }) } })
+const { tokens } = useColorTheme()
 const option = computed(() => ({
+  color: [tokens.value['--primary-mark']],
   animation: false,
   grid: { left: 70, right: 24, top: 24, bottom: 55 },
   tooltip: { trigger: 'axis' },

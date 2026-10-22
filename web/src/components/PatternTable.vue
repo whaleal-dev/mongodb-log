@@ -111,7 +111,7 @@ const sortLabel = computed(() => columns[keys.indexOf(sortKey.value)].label)
 .pattern-filters label:first-child { flex: 1.5 1 180px; }
 .pattern-filters label:nth-child(2) { flex: .6 1 110px; }
 .pattern-filters input, .pattern-filters select, .filter-reset { box-sizing: border-box; height: 32px; min-width: 0; padding: 0 9px; border: 1px solid #d7e0e5; border-radius: 5px; color: #42576a; background: #fff; font: inherit; }
-.pattern-filters input:focus-visible, .pattern-filters select:focus-visible, .filter-reset:focus-visible { outline: 2px solid #91b5a3; outline-offset: 2px; }
+.pattern-filters input:focus-visible, .pattern-filters select:focus-visible, .filter-reset:focus-visible { outline: 2px solid var(--focus-color); outline-offset: 2px; }
 .filter-reset { cursor: pointer; font-size: 12px; }
 .filter-reset:disabled { color: #9ca8b4; cursor: default; }
 .filter-status { margin: 8px 0 12px; flex-shrink: 0; }
@@ -119,10 +119,10 @@ const sortLabel = computed(() => columns[keys.indexOf(sortKey.value)].label)
 .pattern-table { min-width: 1360px; }
 .column-heading { display: flex; align-items: center; gap: 5px; }
 .sort-button { display: inline-flex; align-items: center; gap: 5px; padding: 0; border: 0; color: inherit; background: transparent; cursor: pointer; font-size: inherit; white-space: nowrap; }
-.sort-button:hover, .sort-button:focus-visible { color: #236c52; }
-.sort-button:focus-visible { outline: 2px solid #91b5a3; outline-offset: 3px; }
+.sort-button:hover, .sort-button:focus-visible { color: var(--primary-text); }
+.sort-button:focus-visible { outline: 2px solid var(--focus-color); outline-offset: 3px; }
 .sort-direction { color: #9ca8b4; font-size: 12px; }
-.sort-direction.active { color: #236c52; }
+.sort-direction.active { color: var(--primary-text); }
 .numeric-column .column-heading { justify-content: flex-end; }
 .pattern-table td:nth-child(n+5):nth-child(-n+10) { text-align: right; white-space: nowrap; }
 .pattern-table th { white-space: nowrap; }
