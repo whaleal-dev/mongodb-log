@@ -2,7 +2,7 @@
 
 ## 当前阶段
 
-`0.1.2` 的文档整理、缺陷修正、主题设置、本地制品和双工作区浏览器验证已完成，正在发布。当前公开版本仍为 `0.1.1`；代码推送、`0.1.2` 的 GitHub Release 与 Docker Hub 发布已获授权，尚未完成。
+`0.1.2` 的文档整理、缺陷修正、主题设置、双工作区浏览器验证和公开发布均已完成。代码及 `v0.1.2` 标签已推送，GitHub Release 三份附件与 Docker Hub 双架构 `0.1.2`／`latest` 已核对。
 
 本项目使用 AI 完成设计、编码、测试与文档编写。验证结论以本文件的实际执行记录为准，条件跳过不等于验证通过。
 
@@ -38,9 +38,9 @@
 ### 交付与文档
 
 - 三平台启动脚本使用 `-Xms128m -Xmx2g`，Vue 前端随 Maven 构建打入可执行 JAR。
-- 非 root、多阶段 Docker 镜像支持 `linux/amd64` 与 `linux/arm64`；已公开发布 `0.1.1` 与 `latest`。
+- 非 root、多阶段 Docker 镜像支持 `linux/amd64` 与 `linux/arm64`；已公开发布 `0.1.2` 与 `latest`。
 - [GitHub Release v0.1.1](https://github.com/whaleal-dev/mongodb-log/releases/tag/v0.1.1) 已包含 JAR、三平台启动 ZIP 和 SHA-256 校验文件。
-- `0.1.2` 的 JAR、三平台 ZIP、`SHA256SUMS` 与发布说明已生成于 `target/release/`；包含主题设置的本地双架构镜像为 `whaleal/mongodb-log-analyzer:local-theme-0.1.2`，尚未推送公开标签。
+- [GitHub Release v0.1.2](https://github.com/whaleal-dev/mongodb-log/releases/tag/v0.1.2) 已发布 JAR、三平台 ZIP 和 `SHA256SUMS`，本地制品与发布说明位于 `target/release/`；Docker Hub 的 `0.1.2`／`latest` 与已验收的 `local-theme-0.1.2` 双架构镜像一致。
 - 作者介绍首次使用满 24 小时后最多自动展示一次，保留「关于作者」入口；不加载远程素材，只有主动点击外链才访问外部网站。
 - 中英文 README、用户指南、设计文档和 AI 修改指南已按职责合并重复内容，六份文档减少 476 行，保留全部文档文件。
 - 修正首次构建安装步骤、Node.js 要求、诊断独立降级、异常退出副本保留和删除非事务边界；规范明确文档职责与字段覆盖率口径。
@@ -51,17 +51,19 @@
 
 ## 进行中
 
-- `0.1.2` 代码推送、GitHub Release 与 Docker Hub 发布。
+- 无。
 
 ## 待办
 
-- 推送已验证代码，发布 `v0.1.2` GitHub Release 和 Docker Hub 双架构 `0.1.2`／`latest`，核对远端附件与镜像后同步文档中的公开版本。
+- 无。
 
 ## 阻塞
 
 - 无。已安全复用现有 Git credential／系统钥匙串完成 GitHub CLI 认证预检，未修改凭据。
 
 ## 最近验证
+
+- 2026-10-22，已发布 `0.1.2`：代码与 `v0.1.2` 标签指向 `fadc8aa`。GitHub Release 已公开，JAR 的 SHA-256 为 `7233addae10f33b17c04781ef80002f02e324a211ccd63f98a801be6affac58d`，ZIP 为 `777f00ab3ca4cd048f80563f1d141dd84a990866f387947ae8d8096d042e22fe`，三份附件大小及服务端 SHA-256 均与本机一致。Docker Hub `0.1.2`／`latest` 公开清单均为 `sha256:e1510f0d74eb736cce0849b97e837b43afa6db34557297729113d533c31c7c26`，包含 `linux/amd64` 与 `linux/arm64`，与本地验收清单逐字节一致；`0.1.1` 保持原摘要。中英文 README 与设计文档已同步公开版本。
 
 - 2026-10-22，主题最终 JAR 浏览器验收：Chrome 原生文件选择上传文本、JSON 与 GZip，得到 4 行日志、4 条慢查询、3 组模式，进度、结果与模式最慢语句明细正常；179 字节 FTDC 样例通过「开始建立索引」创建任务，完成 1 个 Block、4 个指标、4 个样本点的索引。Log／Metric 工作区切换和指标组查询正常，紫色主题下单指标组变色、多指标组保留分类色。四种预设、纯白黑字、纯黑白字、非法输入保持主题、灰色偏好刷新恢复通过浏览器复核；保存失败及重试由组件回归覆盖。最终 JAR 页面的浏览器控制台无警告或错误。
 

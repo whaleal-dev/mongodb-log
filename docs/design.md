@@ -875,7 +875,7 @@ mvn clean package
 
 Maven 生命周期执行后端测试，但没有配置执行前端测试；完整验证还需单独运行 Vitest。Dockerfile 的多阶段构建会分别运行前后端测试。首次构建需要网络下载依赖，离线承诺针对已构建应用的运行阶段。
 
-源码版本与公开版本分开管理：当前准备 `0.1.2`，用户启动示例仍固定已发布的 `0.1.1`。实际可下载产物以 [GitHub Releases](https://github.com/whaleal-dev/mongodb-log/releases) 为准，发布结果写入 [项目路线图](../ROADMAP.md) 后再同步示例。
+源码版本与公开版本分开管理：当前公开版本为 `0.1.2`，用户启动示例固定使用该版本。实际可下载产物以 [GitHub Releases](https://github.com/whaleal-dev/mongodb-log/releases) 为准，发布结果写入 [项目路线图](../ROADMAP.md) 后再同步示例。
 
 ## 11．测试与验证设计
 

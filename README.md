@@ -29,12 +29,12 @@ docker run -d \
   --memory=3g \
   -p 127.0.0.1:18080:18080 \
   -v mongodb-log-analyzer-data:/app/data \
-  whaleal/mongodb-log-analyzer:0.1.1
+  whaleal/mongodb-log-analyzer:0.1.2
 ```
 
 启动后访问 `http://127.0.0.1:18080`。容器以非 root 用户运行，JVM 堆上限为 2 GB，进程总内存还包括堆外开销。任务数据保存在命名卷中，升级时继续挂载该卷。
 
-示例固定使用已发布的 `0.1.1`。源码正在准备 `0.1.2`，源码版本变化不代表 JAR 或镜像已经发布；可下载版本以 [GitHub Releases](https://github.com/whaleal-dev/mongodb-log/releases) 为准。
+示例固定使用已发布的 `0.1.2`。源码变化不会自动更新已发布的 JAR 或镜像；可下载版本以 [GitHub Releases](https://github.com/whaleal-dev/mongodb-log/releases) 为准。
 
 ### JAR 发布包
 
