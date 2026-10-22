@@ -173,6 +173,23 @@ class TaskControllerIntegrationTest {
                 .andExpect(jsonPath("$.code").value("INVALID_REQUEST"));
     }
 
+    @Test
+    void returnsEmptyResultsForMaximumPageNumber() throws Exception {
+        MockMultipartFile file = new MockMultipartFile("files", "mongodb.log", "text/plain",
+                Files.readAllBytes(Path.of("src/test/resources/fixtures/structured.log")));
+        MvcResult create = mockMvc.perform(multipart("/api/tasks").file(file))
+                .andExpect(status().isAccepted()).andReturn();
+        String taskId = objectMapper.readTree(create.getResponse().getContentAsString()).path("id").asText();
+        assertThat(waitForTerminalTask(taskId).path("status").asText()).isEqualTo("COMPLETED");
+
+        mockMvc.perform(get("/api/tasks/{id}/slow-queries", taskId)
+                        .param("page", Integer.toString(Integer.MAX_VALUE)).param("size", "50"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.page").value(Integer.MAX_VALUE))
+                .andExpect(jsonPath("$.total").value(1))
+                .andExpect(jsonPath("$.content").isEmpty());
+    }
+
     private JsonNode waitForTerminalTask(String taskId) throws Exception {
         for (int attempt = 0; attempt < 100; attempt++) {
             MvcResult result = mockMvc.perform(get("/api/tasks/{id}", taskId))

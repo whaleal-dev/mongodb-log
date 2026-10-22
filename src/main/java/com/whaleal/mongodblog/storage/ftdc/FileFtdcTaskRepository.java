@@ -15,6 +15,7 @@ import java.io.UncheckedIOException;
 import java.nio.file.AtomicMoveNotSupportedException;
 import java.nio.file.Files;
 import java.nio.file.LinkOption;
+import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.attribute.BasicFileAttributes;
@@ -79,8 +80,16 @@ public class FileFtdcTaskRepository implements FtdcTaskRepository {
             throw new TaskActiveException("排队中或分析中的 FTDC 任务不能删除");
         }
         try {
-            deleteTree(taskDirectory(id));
-            deleteTree(workDirectory(id));
+            validateDirectory(root.getParent());
+            validateDirectory(root);
+            validateDirectory(tasksDirectory);
+            validateDirectory(workDirectory);
+            validateIndexFile(indexFile);
+            validateIndexFile(indexFile.resolveSibling(indexFile.getFileName() + ".tmp"));
+            List<Path> taskPaths = deletionPaths(taskDirectory(id));
+            List<Path> workPaths = deletionPaths(workDirectory(id));
+            for (Path path : workPaths) Files.delete(path);
+            for (Path path : taskPaths) Files.delete(path);
             List<FtdcTask> remaining = listTasks().stream().filter(existing -> !existing.id().equals(id)).toList();
             writeJson(indexFile, remaining);
             tasks.remove(id);
@@ -135,23 +144,41 @@ public class FileFtdcTaskRepository implements FtdcTaskRepository {
         if (task.status() != FtdcTaskStatus.COMPLETED) throw new IllegalStateException("FTDC 任务尚未完成：" + id);
     }
 
-    private void deleteTree(Path directory) throws IOException {
-        BasicFileAttributes rootAttributes = attributes(directory);
-        if (rootAttributes == null) return;
-        if (!rootAttributes.isDirectory() || rootAttributes.isSymbolicLink()) throw new IOException("FTDC 任务路径不是普通目录");
+    private List<Path> deletionPaths(Path directory) throws IOException {
+        if (!validateDirectory(directory)) return List.of();
         try (var paths = Files.walk(directory)) {
-            for (Path path : paths.sorted(Comparator.reverseOrder()).toList()) {
+            List<Path> result = paths.sorted(Comparator.reverseOrder()).toList();
+            for (Path path : result) {
                 if (Files.isSymbolicLink(path)) throw new IOException("FTDC 任务目录包含符号链接");
-                Files.delete(path);
             }
+            return result;
         } catch (UncheckedIOException e) {
             throw e.getCause();
         }
     }
 
+    private boolean validateDirectory(Path directory) throws IOException {
+        BasicFileAttributes attributes = attributes(directory);
+        if (attributes == null) return false;
+        if (!attributes.isDirectory() || attributes.isSymbolicLink()) {
+            throw new IOException("FTDC 任务路径不是普通目录：" + directory.getFileName());
+        }
+        return true;
+    }
+
+    private void validateIndexFile(Path path) throws IOException {
+        BasicFileAttributes attributes = attributes(path);
+        if (attributes != null && (!attributes.isRegularFile() || attributes.isSymbolicLink())) {
+            throw new IOException("FTDC 任务索引路径不是普通文件：" + path.getFileName());
+        }
+    }
+
     private BasicFileAttributes attributes(Path path) throws IOException {
-        if (!Files.exists(path, LinkOption.NOFOLLOW_LINKS)) return null;
-        return Files.readAttributes(path, BasicFileAttributes.class, LinkOption.NOFOLLOW_LINKS);
+        try {
+            return Files.readAttributes(path, BasicFileAttributes.class, LinkOption.NOFOLLOW_LINKS);
+        } catch (NoSuchFileException missing) {
+            return null;
+        }
     }
 
     private void writeJson(Path target, Object value) {

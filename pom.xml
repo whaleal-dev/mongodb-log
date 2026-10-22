@@ -13,7 +13,7 @@
 
     <groupId>com.whaleal</groupId>
     <artifactId>mongodb-log-analyzer</artifactId>
-    <version>0.1.1</version>
+    <version>0.1.2</version>
     <name>MongoDB Log &amp; Metric Analyzer</name>
     <description>Offline MongoDB log and FTDC metric analyzer for operations teams</description>
 

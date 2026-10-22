@@ -173,17 +173,18 @@ public class FtdcSeriesService {
         if (start > end) throw new IllegalArgumentException("查询时间范围无数据");
         int metricCount = group.metricCount();
         SeriesAccumulator[] accumulators = new SeriesAccumulator[metricCount];
+        TimeGapTracker[] gaps = new TimeGapTracker[metricCount];
         for (int i = 0; i < metricCount; i++) {
             accumulators[i] = new SeriesAccumulator(query.maxPoints(), start, end);
+            gaps[i] = new TimeGapTracker(query.maxPoints());
         }
         long[] previous = new long[metricCount];
         boolean[] hasPrevious = new boolean[metricCount];
-        TimeGapTracker gaps = new TimeGapTracker(query.maxPoints());
         GroupContext context = new GroupContext(sourceDirectory, selected.files(), List.copyOf(blocks), metricCount);
         forEachGroupPoint(context, start, end, (timestamp, values, present) -> {
-            gaps.accept(timestamp);
             for (int metricIndex = 0; metricIndex < metricCount; metricIndex++) {
                 if (!present[metricIndex]) continue;
+                gaps[metricIndex].accept(timestamp);
                 long rawValue = values[metricIndex];
                 Long value = rawValue;
                 if (query.view() == FtdcSeriesQuery.View.DELTA) {
@@ -194,12 +195,11 @@ public class FtdcSeriesService {
                 accumulators[metricIndex].accept(timestamp, value);
             }
         });
-        TimeGapSummary gapSummary = gaps.summary();
         List<FtdcSeriesResult> output = new ArrayList<>(metricCount);
         for (int metricIndex = 0; metricIndex < metricCount; metricIndex++) {
             FtdcCatalog.Metric metric = group.metrics().get(metricIndex);
             output.add(accumulators[metricIndex].result(
-                    metric.metricId(), metric.path(), query.view(), gapSummary));
+                    metric.metricId(), metric.path(), query.view(), gaps[metricIndex].summary()));
         }
         return new FtdcGroupSeriesResult(group.groupId(), group.name(), query.view().name().toLowerCase(), output);
     }

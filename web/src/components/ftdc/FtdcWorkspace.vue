@@ -21,6 +21,7 @@ const coreGroupNames = new Set([
 ])
 const coreGroupPrefixes = ['systemMetrics/cpu', 'systemMetrics/memory', 'systemMetrics/disks/']
 let pollTimer, groupVersion = 0
+let pollingVersion = 0, listVersion = 0
 const pendingPollTasks = new Set()
 let chartCommandVersion = 0
 let groupController
@@ -37,7 +38,13 @@ const selectedMetricCount = computed(() => selectedGroups.value.reduce((sum, gro
 const coreGroups = computed(() => groups.value.filter(group => coreGroupNames.has(group.name)
   || coreGroupPrefixes.some(prefix => group.name.startsWith(prefix))))
 
-async function loadTasks() { try { tasks.value = await fetchFtdcTasks() } catch (e) { ElMessage.error(e.message) } }
+async function loadTasks() {
+  const version = ++listVersion
+  try {
+    const result = await fetchFtdcTasks()
+    if (version === listVersion) tasks.value = result
+  } catch (e) { if (version === listVersion) ElMessage.error(e.message) }
+}
 async function selectTask(task) {
   cancelRequests(); stopPolling(); selectedTask.value = task; error.value = ''; groupFailureSummary.value = ''
   groupKeyword.value = ''; groups.value = []; selectedGroupIds.value = []; groupResults.value = []
@@ -86,13 +93,36 @@ function selectCoreGroups() { selectedGroupIds.value = coreGroups.value.map(grou
 function clearGroupSelection() { selectedGroupIds.value = []; selectionChanged() }
 function setAllCollapsed(value) { collapseAllCommand.value = { value, version: ++chartCommandVersion } }
 function setAllHideZero(value) { hideZeroAllCommand.value = { value, version: ++chartCommandVersion } }
-function startPolling(id) { pollTimer = window.setInterval(async () => { if (pendingPollTasks.has(id)) return; pendingPollTasks.add(id); try { const task = await fetchFtdcTask(id); if (selectedTask.value?.id !== id) return; selectedTask.value = task; if (['COMPLETED','FAILED'].includes(task.status)) { stopPolling(); await loadTasks(); if (task.status === 'COMPLETED') await loadGroups() } } catch (e) { stopPolling(); error.value = e.message } finally { pendingPollTasks.delete(id) } }, 1000) }
-function stopPolling() { if (pollTimer) clearInterval(pollTimer); pollTimer = null }
+function startPolling(id) {
+  stopPolling()
+  const version = pollingVersion
+  pollTimer = window.setInterval(async () => {
+    if (pendingPollTasks.has(id)) return
+    pendingPollTasks.add(id)
+    try {
+      const task = await fetchFtdcTask(id)
+      if (version !== pollingVersion || selectedTask.value?.id !== id) return
+      selectedTask.value = task
+      if (['COMPLETED','FAILED'].includes(task.status)) {
+        stopPolling()
+        const completionVersion = pollingVersion
+        await loadTasks()
+        if (completionVersion !== pollingVersion || selectedTask.value?.id !== id) return
+        if (task.status === 'COMPLETED') await loadGroups()
+      }
+    } catch (e) {
+      if (version === pollingVersion && selectedTask.value?.id === id) {
+        stopPolling(); error.value = e.message
+      }
+    } finally { pendingPollTasks.delete(id) }
+  }, 1000)
+}
+function stopPolling() { ++pollingVersion; if (pollTimer) clearInterval(pollTimer); pollTimer = null }
 function cancelRequests() { ++groupVersion; groupController?.abort() }
-function created(task) { tasks.value.unshift(task); selectTask(task) }
-function deleted(id) { tasks.value = tasks.value.filter(task => task.id !== id) }
+function created(task) { ++listVersion; tasks.value.unshift(task); selectTask(task) }
+function deleted(id) { ++listVersion; tasks.value = tasks.value.filter(task => task.id !== id) }
 function back() { cancelRequests(); stopPolling(); selectedTask.value = null; groupResults.value = []; loadTasks() }
-onMounted(loadTasks); onBeforeUnmount(() => { cancelRequests(); stopPolling() })
+onMounted(loadTasks); onBeforeUnmount(() => { ++listVersion; cancelRequests(); stopPolling() })
 </script>
 
 <template>

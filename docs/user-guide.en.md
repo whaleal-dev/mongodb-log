@@ -15,7 +15,7 @@ MongoDB Log & Metric Analyzer is a local, offline file-analysis application with
 
 The application does not connect to a MongoDB server. Runtime use does not require MongoDB, Node.js, Nacos, S3, an AI service, or Internet access. The server listens only on `127.0.0.1:18080` by default, and all parsing and field interpretation happen on the local computer.
 
-This project was designed, implemented, tested, and documented entirely with AI. Future changes or extensions are best made with AI while following the project rules and existing validation workflow. Although the project is AI-authored, its core analysis logic, statistical definitions, and outputs have been verified through automated tests, real-world samples, and human review.
+See the [project overview](../README.en.md) for version information, downloads, and source builds, and the [project roadmap](../ROADMAP.md) for recorded tests, conditional skips, and historical acceptance results. Historical validation does not mean that it has been repeated for the current source version.
 
 ## 2. Requirements
 
@@ -57,7 +57,7 @@ Task data is stored in the `mongodb-log-analyzer-data` named volume. You can rec
 
 ### JAR release: macOS
 
-The first time, open a terminal in the release directory and run:
+Download and extract a launcher package from [GitHub Releases](https://github.com/whaleal-dev/mongodb-log/releases). The first time, open a terminal in the extracted directory and run:
 
 ```bash
 chmod +x scripts/start.command scripts/start.sh
@@ -83,7 +83,7 @@ No dialog appears on first use. After 24 elapsed hours, a visible page automatic
 
 Clearing site data, changing browsers, or using a different application address resets the delay. When browser storage is unavailable, first-use time and viewed status can only be maintained within the current page.
 
-To stop the application, close the launcher window or press `Ctrl+C` in its terminal. Avoid force-stopping it while a Log analysis or Metric indexing task is running. An interrupted task is marked as failed after the next startup and must be deleted and uploaded again.
+To stop the application, close the launcher window or press `Ctrl+C` in its terminal. If the process exits during Log analysis or Metric indexing, the interrupted task is marked as failed after the next startup and is not resumed. Working copies may remain; delete the failed task from its task list, then upload the files again.
 
 ## 4. Use the MongoDB Log Workspace
 
@@ -123,6 +123,10 @@ Click `导出 AI 分析报告` (Export AI analysis report) to download a Markdow
 
 The application does not automatically send the report anywhere. It excludes full commands, complete raw logs, and attributes. During export it masks MongoDB URIs, IPv4 and IPv6 addresses, email addresses, and values explicitly labeled with `user`, `username`, `principal`, `password`, `passwd`, `token`, or `secret`. Task names, file names, namespaces, normalized query patterns, execution plans, and other aggregate fields can still appear, so review the exported file against your organization's data-security requirements before sharing it.
 
+Report sanitization does not anonymize the local task directory. Retained slow-query details contain original log text, attributes, and potentially command literals. FTDC copies are also original diagnostic data; handle them with the same care as source files. The source version being prepared for `0.1.2` adds sanitization before diagnostic messages are saved, but upgrading does not rewrite results already saved by older versions. Sanitization covers recognized formats, including JSON key-value pairs and quoted identity or credential values; it does not guarantee anonymity for arbitrary free text.
+
+Diagnostics are saved separately. Missing historical diagnostics or a failure to save diagnostics does not invalidate a completed slow-query analysis. The page reports unavailable diagnostics, and the report falls back to available aggregates. For complete diagnostics, check disk space and permissions, then upload the source files again.
+
 The web interface renders timestamps in the browser’s local timezone. Exported Markdown reports use UTC so that events can be compared consistently across systems.
 
 ## 5. Use the MongoDB Metric Workspace
@@ -154,11 +158,31 @@ When files contain the same timestamp, values from the file that appeared earlie
 
 The application stores managed task data under the `data` directory relative to its startup directory.
 
+```text
+data/
+├── tasks-index.json
+├── tasks/<task-id>/
+│   ├── metadata.json
+│   ├── summary.json
+│   ├── diagnostics.json
+│   └── top-slow-queries.jsonl
+├── work/<task-id>/
+└── ftdc/
+    ├── tasks-index.json
+    ├── tasks/<task-id>/
+    │   ├── metadata.json
+    │   ├── catalog.json
+    │   ├── blocks.idx
+    │   └── source/<uploaded-file>
+    └── work/<task-id>/
+```
+
 ### Log data
 
 - The source files selected by the user are never modified.
-- Temporary uploaded copies stay under a working directory only during analysis and are removed after the task completes or fails.
+- Normal processing cleans working copies before completing or failing; a cleanup failure marks the task as failed. An interrupted process may leave copies behind. Restart recovery only marks that task as failed and does not delete those copies.
 - The application does not persist every log line. It retains aggregate results, the globally slowest 5,000 query records, and one separate slowest sample for each selected Top 50 query pattern.
+- These results remain until task deletion. Separate diagnostics retain aggregates, time buckets, and at most three message samples per category.
 
 ### Metric data
 
@@ -172,6 +196,7 @@ The application stores managed task data under the `data` directory relative to 
 - Clicking `删除` (Delete) in a task list removes only application-managed data for that task. It does not delete the user's source files.
 - Queued or active tasks cannot be deleted; wait for them to finish first.
 - The clear-all action available from the memory indicator removes all terminal Log and Metric tasks plus their managed data after confirmation. If any task is active, the entire operation is rejected before anything is removed.
+- After that active-task check, deletion proceeds task by task. A later permission or disk error does not roll back earlier deletions. The failed task's record remains so that deletion can be retried after fixing the environment.
 
 ## 7. Capabilities and Resource Limits
 
@@ -187,7 +212,7 @@ The application stores managed task data under the `data` directory relative to 
 - Results depend on the fields present in the logs. If `cpuNanos`, connection counts, scan counts, or execution plans are absent, related metrics show no data rather than zero.
 - Latency buckets, Top 20 aggregates, and Top 50 patterns are calculated from the full input. Scatter plots and globally retained query details are limited to the slowest 5,000 records.
 - Each selected Top 50 query pattern has only one separately retained slowest sample; this is not a complete archive of all records for that pattern.
-- Structured logs are parsed according to the fields implemented by the analyzer. Coverage counts record the presence of those known diagnostic fields; additional unknown fields are ignored. Unrecognized lines do not contribute to valid statistics.
+- Structured logs are parsed according to the fields implemented by the analyzer. Coverage counts include supported fields only. Unknown fields do not contribute to those statistics but may remain in retained slow-query attributes. Unrecognized lines do not contribute to valid statistics.
 - Upgrading the application does not recalculate historical tasks. Re-upload source files to apply new parsing or diagnostic rules.
 
 ### 7.3 Metric analysis limits
@@ -238,4 +263,5 @@ Historical results are not recalculated after an upgrade. Upload the original fi
 - [English project overview](../README.en.md)
 - [中文项目介绍](../README.md)
 - [中文使用指南](user-guide.md)
+- [Project design and APIs](design.md) (Chinese)
 - [Project roadmap](../ROADMAP.md) (Chinese)

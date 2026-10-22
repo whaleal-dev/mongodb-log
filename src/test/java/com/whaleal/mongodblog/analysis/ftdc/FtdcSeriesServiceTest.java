@@ -159,6 +159,67 @@ class FtdcSeriesServiceTest {
     }
 
     @Test
+    void detectsGapsPerMetricWhenAnotherMetricRemainsPresentAcrossSchemaChanges() {
+        ObjectMapper mapper = new ObjectMapper().findAndRegisterModules();
+        FileFtdcTaskRepository gapRepository = new FileFtdcTaskRepository(directory.resolve("metric-gap"), mapper);
+        FtdcOperationGate gapGate = new FtdcOperationGate();
+        FtdcTaskService tasks = new FtdcTaskService(gapRepository,
+                new FtdcTaskRunner(gapRepository, gapGate, mapper), Runnable::run);
+        byte[] content = FtdcFixtureBuilder.file(FtdcFixtureBuilder.metadata(),
+                networkBlock(new long[]{1_000L, 2_000L, 3_000L}, true),
+                networkBlock(new long[]{4_000L, 5_000L, 6_000L, 7_000L, 8_000L, 9_000L}, false),
+                networkBlock(new long[]{10_000L, 11_000L, 12_000L}, true));
+        FtdcTask gapTask = tasks.create("metric-gap", List.of(
+                new MockMultipartFile("files", "metrics.gap", null, content)));
+        FtdcSeriesService gapService = new FtdcSeriesService(gapRepository, gapGate);
+        FtdcMetricGroups.Group group = gapService.groups(gapTask.id()).stream()
+                .filter(item -> item.name().equals("server/network")).findFirst().orElseThrow();
+
+        for (FtdcSeriesQuery.View view : FtdcSeriesQuery.View.values()) {
+            for (int maxPoints : new int[]{4, 1_200}) {
+                List<FtdcSeriesResult> results = gapService.groupSeries(gapTask.id(), group.groupId(),
+                        new FtdcSeriesQuery(null, null, maxPoints, view)).series();
+                FtdcSeriesResult intermittent = results.stream()
+                        .filter(result -> result.path().equals("server/network/in")).findFirst().orElseThrow();
+                FtdcSeriesResult continuous = results.stream()
+                        .filter(result -> result.path().equals("server/network/out")).findFirst().orElseThrow();
+
+                assertThat(intermittent.timestamps()).hasSizeLessThanOrEqualTo(maxPoints);
+                assertThat(intermittent.timestamps().get(0)).isEqualTo(1_000L);
+                assertThat(intermittent.timestamps().get(intermittent.timestamps().size() - 1)).isEqualTo(12_000L);
+                int gapIndex = intermittent.timestamps().indexOf(4_000L);
+                assertThat(gapIndex).isGreaterThanOrEqualTo(0);
+                assertThat(intermittent.values().get(gapIndex)).isNull();
+                long expectedInitialNulls = view == FtdcSeriesQuery.View.DELTA ? 1 : 0;
+                assertThat(intermittent.values().stream().filter(java.util.Objects::isNull).count())
+                        .isEqualTo(expectedInitialNulls + 1);
+                assertThat(continuous.values().stream().filter(java.util.Objects::isNull).count())
+                        .isEqualTo(expectedInitialNulls);
+                assertThat(intermittent.min()).isEqualTo(view == FtdcSeriesQuery.View.RAW ? 1L : 0L);
+                assertThat(intermittent.max()).isEqualTo(view == FtdcSeriesQuery.View.RAW ? 1L : 0L);
+            }
+        }
+    }
+
+    private BsonDocument networkBlock(long[] timestamps, boolean includeIn) {
+        BsonDocument network = new BsonDocument();
+        List<long[]> columns = new java.util.ArrayList<>();
+        columns.add(timestamps);
+        if (includeIn) {
+            network.append("in", new BsonInt64(1));
+            long[] incoming = new long[timestamps.length];
+            java.util.Arrays.fill(incoming, 1);
+            columns.add(incoming);
+        }
+        network.append("out", new BsonInt64(2));
+        long[] outgoing = new long[timestamps.length];
+        java.util.Arrays.fill(outgoing, 2);
+        columns.add(outgoing);
+        return FtdcFixtureBuilder.block(new BsonDocument("start", new BsonDateTime(timestamps[0]))
+                .append("server", new BsonDocument("network", network)), columns);
+    }
+
+    @Test
     void pagesRawValuesAndStreamsGzipCsv() throws Exception {
         String metricId = repository.readCatalog(task.id()).metrics().stream()
                 .filter(metric -> metric.path().equals("server/counter")).findFirst().orElseThrow().metricId();

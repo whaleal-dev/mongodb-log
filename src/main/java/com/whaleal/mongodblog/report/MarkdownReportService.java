@@ -5,6 +5,7 @@ import com.whaleal.mongodblog.analysis.AggregateStat;
 import com.whaleal.mongodblog.analysis.DurationBucketStat;
 import com.whaleal.mongodblog.analysis.PatternStat;
 import com.whaleal.mongodblog.analysis.SlowQueryRecord;
+import com.whaleal.mongodblog.analysis.diagnostics.DiagnosticTextRedactor;
 import com.whaleal.mongodblog.analysis.diagnostics.LogDiagnostics;
 import com.whaleal.mongodblog.storage.TaskRepository;
 import com.whaleal.mongodblog.task.AnalysisTask;
@@ -16,19 +17,9 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
-import java.util.regex.Pattern;
 
 @Service
 public class MarkdownReportService {
-    private static final Pattern IPV4 = Pattern.compile("\\b(?:\\d{1,3}\\.){3}\\d{1,3}\\b");
-    private static final Pattern IPV6 = Pattern.compile(
-            "(?i)(?<![0-9a-f:])(?:[0-9a-f]{0,4}:){2,}[0-9a-f:.]{0,15}(?:%[a-z0-9_.-]+)?(?![0-9a-f:])");
-    private static final Pattern MONGODB_URI = Pattern.compile("(?i)mongodb(?:\\+srv)?://\\S+");
-    private static final Pattern EMAIL = Pattern.compile("[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}");
-    private static final Pattern SECRET = Pattern.compile("(?i)(password|passwd|token|secret)(\\s*[:=]\\s*)([^\\s,;]+)");
-    private static final Pattern USER_IDENTITY = Pattern.compile(
-            "(?i)\\b(user(?:name)?|principal)(\\s*[:=]\\s*)([^\\s,;]+)");
-
     private final TaskRepository repository;
 
     public MarkdownReportService(TaskRepository repository) {
@@ -536,13 +527,7 @@ public class MarkdownReportService {
     }
 
     private String redact(String value) {
-        if (value == null) return "";
-        String redacted = MONGODB_URI.matcher(value).replaceAll("[MongoDB URI]");
-        redacted = IPV6.matcher(redacted).replaceAll("[IP]");
-        redacted = IPV4.matcher(redacted).replaceAll("[IP]");
-        redacted = EMAIL.matcher(redacted).replaceAll("[EMAIL]");
-        redacted = USER_IDENTITY.matcher(redacted).replaceAll("$1$2[REDACTED]");
-        return SECRET.matcher(redacted).replaceAll("$1$2[REDACTED]");
+        return DiagnosticTextRedactor.redact(value);
     }
 
     private String decimal(Number value) {

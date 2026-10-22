@@ -181,7 +181,7 @@ public final class DiagnosticAccumulator {
 
     private void acceptAbnormalEvent(ParsedLogEntry entry) {
         String key = valueOrUnknown(entry.component()) + "|"
-                + (entry.messageId() == null ? valueOrUnknown(entry.message()) : entry.messageId());
+                + (entry.messageId() == null ? DiagnosticTextRedactor.redact(valueOrUnknown(entry.message())) : entry.messageId());
         MutableEvent event = abnormalEvents.get(key);
         if (event == null) {
             if (abnormalEvents.size() >= MAX_EVENT_TYPES) return;
@@ -216,7 +216,8 @@ public final class DiagnosticAccumulator {
     }
 
     private void acceptReplication(ParsedLogEntry entry, ReplicationType type) {
-        String key = type.name() + "|" + (entry.messageId() == null ? valueOrUnknown(entry.message()) : entry.messageId());
+        String key = type.name() + "|" + (entry.messageId() == null
+                ? DiagnosticTextRedactor.redact(valueOrUnknown(entry.message())) : entry.messageId());
         MutableReplicationEvent event = replicationEvents.get(key);
         if (event == null) {
             if (replicationEvents.size() >= MAX_REPLICATION_TYPES) return;
@@ -532,7 +533,7 @@ public final class DiagnosticAccumulator {
             this.severity = entry.severity();
             this.component = entry.component();
             this.messageId = entry.messageId();
-            this.message = entry.message();
+            this.message = DiagnosticTextRedactor.redact(entry.message());
             this.first = entry.timestampEpochMillis();
             this.last = entry.timestampEpochMillis();
         }
@@ -541,7 +542,8 @@ public final class DiagnosticAccumulator {
             count++;
             first = Math.min(first, entry.timestampEpochMillis());
             last = Math.max(last, entry.timestampEpochMillis());
-            if (samples.size() < 3) samples.add(new LogDiagnostics.EventSample(entry.timestampEpochMillis(), entry.message()));
+            if (samples.size() < 3) samples.add(new LogDiagnostics.EventSample(
+                    entry.timestampEpochMillis(), DiagnosticTextRedactor.redact(entry.message())));
         }
 
         private LogDiagnostics.EventStat snapshot() {
@@ -562,7 +564,7 @@ public final class DiagnosticAccumulator {
             this.type = type;
             this.component = entry.component();
             this.messageId = entry.messageId();
-            this.message = entry.message();
+            this.message = DiagnosticTextRedactor.redact(entry.message());
             this.first = entry.timestampEpochMillis();
             this.last = entry.timestampEpochMillis();
         }

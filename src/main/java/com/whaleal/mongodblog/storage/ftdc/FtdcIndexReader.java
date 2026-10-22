@@ -88,6 +88,7 @@ public final class FtdcIndexReader {
                 }
                 int metricIndex = schemas.get(schemaId).indexOf(metricPath);
                 int timeIndex = schemas.get(schemaId).indexOf("start");
+                requireRemaining(channel, cursor.position, (long) numAttributes * 16);
                 long arraysStart = cursor.position;
                 long metricBaseline = metricIndex < 0 ? 0 : readLongAt(channel, arraysStart + (long) metricIndex * 8);
                 long timeBaseline = timeIndex < 0 ? 0 : readLongAt(channel, arraysStart + (long) timeIndex * 8);
@@ -187,6 +188,7 @@ public final class FtdcIndexReader {
             resultIndexes[count] = resultIndex;
             count++;
         }
+        requireRemaining(channel, cursor.position, (long) numAttributes * 16);
         long arraysStart = cursor.position;
         long offsetsStart = arraysStart + (long) numAttributes * Long.BYTES;
         long zerosStart = offsetsStart + (long) numAttributes * Integer.BYTES;
@@ -223,6 +225,9 @@ public final class FtdcIndexReader {
         cursor.fileCount = checkedCount(readInt(channel, cursor), "文件");
         cursor.schemaCount = checkedCount(readInt(channel, cursor), "schema");
         cursor.blockCount = checkedCount(readInt(channel, cursor), "block");
+        if (cursor.fileCount > 20) throw new IllegalStateException("FTDC 索引文件数量不能超过 20");
+        requireRemaining(channel, cursor.position,
+                (long) cursor.fileCount * 24 + (long) cursor.schemaCount * 8 + (long) cursor.blockCount * 64);
         return cursor;
     }
 
@@ -241,6 +246,7 @@ public final class FtdcIndexReader {
             int id = readInt(channel, cursor);
             if (id != i) throw new IllegalStateException("FTDC schema ID 不连续");
             int pathCount = checkedCount(readInt(channel, cursor), "指标");
+            requireRemaining(channel, cursor.position, (long) pathCount * Integer.BYTES);
             List<String> paths = new ArrayList<>(pathCount);
             for (int p = 0; p < pathCount; p++) paths.add(readString(channel, cursor));
             schemas.add(new FtdcSchema(paths));
@@ -262,6 +268,7 @@ public final class FtdcIndexReader {
         long start = readLong(channel, cursor);
         long end = readLong(channel, cursor);
         long pointOffset = readLong(channel, cursor);
+        requireRemaining(channel, cursor.position, (long) numAttributes * 16);
         long[] baseline = new long[numAttributes];
         int[] offsets = new int[numAttributes];
         int[] zeros = new int[numAttributes];
@@ -300,6 +307,7 @@ public final class FtdcIndexReader {
     }
 
     private byte[] readBytesAt(FileChannel channel, long position, int length) throws IOException {
+        requireRemaining(channel, position, length);
         ByteBuffer buffer = ByteBuffer.allocate(length);
         while (buffer.hasRemaining()) {
             int read = channel.read(buffer, position + buffer.position());
@@ -309,6 +317,7 @@ public final class FtdcIndexReader {
     }
 
     private byte[] readBytes(FileChannel channel, Cursor cursor, int length) throws IOException {
+        requireRemaining(channel, cursor.position, length);
         ByteBuffer buffer = ByteBuffer.allocate(length);
         while (buffer.hasRemaining()) {
             int read = channel.read(buffer, cursor.position + buffer.position());
@@ -316,6 +325,13 @@ public final class FtdcIndexReader {
         }
         cursor.position += length;
         return buffer.array();
+    }
+
+    private void requireRemaining(FileChannel channel, long position, long length) throws IOException {
+        long size = channel.size();
+        if (position < 0 || length < 0 || position > size || length > size - position) {
+            throw new EOFException("FTDC 索引截断");
+        }
     }
 
     private IllegalStateException indexError(Exception error) {

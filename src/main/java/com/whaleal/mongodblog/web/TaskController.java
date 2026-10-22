@@ -115,7 +115,7 @@ public class TaskController {
                 .filter(record -> record.durationMillis() >= minDurationMillis)
                 .filter(record -> contains(record.planSummary(), planSummary))
                 .toList();
-        int from = Math.min((page - 1) * size, filtered.size());
+        int from = (int) Math.min((long) (page - 1) * size, filtered.size());
         int to = Math.min(from + size, filtered.size());
         return new SlowQueryPage(page, size, filtered.size(), filtered.subList(from, to));
     }

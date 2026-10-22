@@ -43,11 +43,14 @@ class MarkdownReportServiceTest {
                 Map.of("NETWORK", 1L),
                 List.of(new LogDiagnostics.EventStat(
                         "NETWORK|1", "W", "NETWORK", 1,
-                        "Failure from 2001:db8::3 user=alice token=visible-token", 1,
+                        "Failure from 2001:db8::3 user=alice token=visible-token "
+                                + "{\"token\":\"json-token\",\"username\":\"json-user\","
+                                + "\"password\":\"quoted password value\"}", 1,
                         1_725_000_000_000L, 1_725_000_000_000L,
                         List.of(new LogDiagnostics.EventSample(
                                 1_725_000_000_000L,
-                                "principal=bob source=2001:db8::4 secret=visible-secret")))),
+                                "principal=bob source=2001:db8::4 secret=visible-secret; "
+                                        + "Failed to authenticate user \"quoted-user\"; password='single quoted secret'")))),
                 List.of(),
                 3_600_000,
                 new LogDiagnostics.ConnectionDiagnostics(
@@ -84,6 +87,7 @@ class MarkdownReportServiceTest {
                 .doesNotContain(
                         "2001:db8::1", "2001:db8::2", "2001:db8::3", "2001:db8::4", "2001:db8::5",
                         "alice", "bob", "carol", "owner", "visible-token", "visible-secret",
+                        "json-token", "json-user", "quoted password value", "quoted-user", "single quoted secret",
                         "RAW-COMMAND", "raw-secret", "PRIVATE-LITERAL");
         assertThat(report.fileName()).doesNotContain("2001:db8::1", "owner");
         assertThat(count(report.content(), "pattern-slowest")).isEqualTo(2);

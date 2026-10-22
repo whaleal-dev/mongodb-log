@@ -1,7 +1,10 @@
 package com.whaleal.mongodblog.analysis.diagnostics;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.whaleal.mongodblog.parser.LegacyLogParser;
 import com.whaleal.mongodblog.parser.ParseOutcome;
 import com.whaleal.mongodblog.parser.ParsedLogEntry;
+import com.whaleal.mongodblog.parser.QueryPatternNormalizer;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -10,6 +13,33 @@ import java.util.Map;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class DiagnosticAccumulatorTest {
+    @Test
+    void redactsLegacyEventKeysMessagesAndSamplesBeforePersistenceWithoutChangingEntries() throws Exception {
+        LegacyLogParser parser = new LegacyLogParser(new QueryPatternNormalizer());
+        String first = "2026-10-22T10:00:00.000+0800 W NETWORK [conn1] "
+                + "Heartbeat failed from 192.0.2.15 user=alice token=first-token";
+        String second = "2026-10-22T10:00:01.000+0800 W NETWORK [conn2] "
+                + "Heartbeat failed from 192.0.2.16 user=bob token=second-token";
+        ParseOutcome outcome = parser.parse(first, 1, 0);
+        DiagnosticAccumulator accumulator = new DiagnosticAccumulator();
+        accumulator.accept(outcome);
+        accumulator.accept(parser.parse(second, 2, 0));
+
+        LogDiagnostics result = accumulator.finish();
+        String persisted = new ObjectMapper().writeValueAsString(result);
+
+        assertThat(persisted).contains("[IP]", "[REDACTED]")
+                .doesNotContain("192.0.2.15", "192.0.2.16", "alice", "bob", "first-token", "second-token");
+        assertThat(result.abnormalEvents()).singleElement().satisfies(event -> {
+            assertThat(event.count()).isEqualTo(2);
+            assertThat(event.samples()).hasSize(2);
+        });
+        assertThat(result.replicationEvents()).singleElement()
+                .satisfies(event -> assertThat(event.count()).isEqualTo(2));
+        assertThat(outcome.entry().orElseThrow().rawLine()).isEqualTo(first);
+        assertThat(outcome.entry().orElseThrow().message()).contains("alice", "first-token");
+    }
+
     @Test
     void aggregatesEventsConnectionsReplicationAndSlowQuerySignalsWithoutChangingRawEntries() {
         DiagnosticAccumulator accumulator = new DiagnosticAccumulator();
