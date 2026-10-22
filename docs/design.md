@@ -773,6 +773,15 @@ FTDC 必须保留源副本以支持后续按需解码，因此磁盘占用与上
 
 应用启动完成后尝试打开当前配置的本地地址。桌面能力不可用或打开失败只写警告，不影响服务继续运行。可通过 `mongodblog.open-browser=false` 禁用。
 
+### 8.5 作者推广弹窗
+
+- `AuthorPromotionDialog` 在应用顶部右侧挂载，提供「关于作者」按钮，Log 与 Metric 共用一次提醒状态，切换工作区不会重新创建组件。窄屏下顶部导航换行，保留手动入口。
+- 展示作者简介、Whaleal MongoDB 核心作品和 `whaleal-dev` 公开仓库三个链接；可通过关闭按钮、「继续使用」、遮罩或 `Esc` 退出。使用现有 Element Plus 对话框处理焦点与键盘交互。
+- `localStorage` 的 `mongodb-log:author-promotion:v2` 保存 `{ firstUsedAt, viewed }`。首次使用以 UTC 毫秒记录，不立即弹窗；满 24 个自然小时后，在页面可见时仅自动展示一次，展示前持久化已查看状态并停止计时。页面加载、定时到期、窗口获焦和恢复可见时核对时间，不累计活跃操作时长。
+- 手动打开也标记为已查看，之后不再自动提醒，按钮仍可反复打开。兼容旧版 `mongodb-log:author-promotion:last-shown:v1` 的有效展示时间，已有记录视为已查看；非法或未来时间记录不会触发立即弹窗，禁止存储时退化为当前页面内存状态。定时检查会重读存储，避免其他标签页已展示后重复提醒。
+- 状态按浏览器与应用地址隔离。清除站点数据或更换浏览器／地址会重置，不修改分析任务和统计结果。
+- 弹窗样式和文案随应用打包，不加载远程素材、脚本、iframe 或跟踪请求。三个 HTTPS 外链仅在点击后以 `target="_blank"` 打开，并设置 `rel="noopener noreferrer"` 与 `referrerpolicy="no-referrer"`。
+
 ## 9．REST API 设计
 
 ### 9.1 Log API

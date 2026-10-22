@@ -46,7 +46,7 @@ docker run -d \
   --memory=3g \
   -p 127.0.0.1:18080:18080 \
   -v mongodb-log-analyzer-data:/app/data \
-  whaleal/mongodb-log-analyzer:0.1.0
+  whaleal/mongodb-log-analyzer:0.1.1
 ```
 
 启动后访问 `http://127.0.0.1:18080`。执行 `docker stop mongodb-log-analyzer` 停止，执行 `docker start mongodb-log-analyzer` 再次启动。
@@ -76,6 +76,10 @@ chmod +x scripts/start.command scripts/start.sh
 双击 `scripts\start.bat`。
 
 启动成功后，浏览器通常会自动打开 `http://127.0.0.1:18080`。如果没有自动打开，可手动访问该地址。
+
+首次使用时不会弹窗。首次打开页面满 24 小时后，在页面可见时仅自动展示一次作者介绍，提供作者简介、Whaleal MongoDB 核心作品与 `whaleal-dev` 公开仓库链接。右上角「关于作者」按钮可随时打开；点击「继续使用」、关闭按钮、遮罩或按 `Esc` 即可关闭。手动查看后不再自动提醒，旧版已展示过的浏览器也不再自动提醒。首次使用时间与已查看状态保存在当前浏览器，刷新、重启或切换工作区不会重置；这里的一天指经过的 24 小时，不是累计操作时长。外链在点击后通过新标签页打开，不会自动加载外部内容或上传分析数据。
+
+清除浏览器站点数据、换浏览器或换应用地址后会重新计时；浏览器禁止本地存储时，只能在当前页面维持首次使用时间与已查看状态。
 
 停止程序时，关闭启动窗口或在启动终端按 `Ctrl+C`。不要在任务分析或 Metric 索引建立期间直接强制结束进程；中断的任务在下次启动后会标记为失败，需要删除后重新上传。
 

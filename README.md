@@ -35,6 +35,7 @@
 
 - 默认只监听 `127.0.0.1:18080`。
 - 运行时不需要 MongoDB、Node.js、Nacos、S3、外部 AI 服务或网络连接。
+- 首次使用满 24 小时后仅自动展示一次作者介绍，可直接关闭；右上角「关于作者」可随时查看，手动查看或旧版已展示过后不再自动提醒。三个外链分别指向作者简介、Whaleal 核心作品与组织公开仓库，仅在点击后访问。
 - 任务结果保存在启动目录下的 `data`，不会修改用户选择的原文件。
 - Log 分析和 Metric 建索引共用单工作线程；FTDC 建索引与指标查询另有公平串行许可，避免重型操作争抢内存。
 
@@ -45,7 +46,7 @@
 公开镜像位于 [Docker Hub](https://hub.docker.com/r/whaleal/mongodb-log-analyzer) ，支持 `linux/amd64` 与 `linux/arm64`。运行时不需要安装 Java、Node.js 或 MongoDB：
 
 ```bash
-docker pull whaleal/mongodb-log-analyzer:0.1.0
+docker pull whaleal/mongodb-log-analyzer:0.1.1
 
 docker run -d \
   --name mongodb-log-analyzer \
@@ -53,12 +54,12 @@ docker run -d \
   --memory=3g \
   -p 127.0.0.1:18080:18080 \
   -v mongodb-log-analyzer-data:/app/data \
-  whaleal/mongodb-log-analyzer:0.1.0
+  whaleal/mongodb-log-analyzer:0.1.1
 ```
 
 启动后访问 `http://127.0.0.1:18080`。容器以非 root 用户运行，JVM 堆上限为 2 GB，命名卷 `mongodb-log-analyzer-data` 用于持久化任务数据。应用没有账号和授权机制，因此示例只向本机开放端口；不要把端口直接暴露到公网。升级或重建容器时保留该命名卷，也不要执行会删除它的 `docker compose down -v`。
 
-同时提供 `latest` 标签，但固定部署建议使用明确版本号 `0.1.0`。
+同时提供 `latest` 标签，但固定部署建议使用明确版本号 `0.1.1`。
 
 ### 使用 JAR
 

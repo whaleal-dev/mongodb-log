@@ -37,6 +37,7 @@ See the [English User Guide](docs/user-guide.en.md) for complete operating instr
 
 - Listens on `127.0.0.1:18080` by default.
 - Runtime use does not require MongoDB, Node.js, Nacos, S3, an external AI service, or an Internet connection.
+- An author introduction appears automatically only once, 24 hours after first use. The top-right `关于作者` button opens it at any time; manually viewing it or having seen the previous version suppresses the automatic reminder. The author's profile, Whaleal product, and public organization repositories are accessed only after a link is clicked.
 - Stores managed task data under the local `data` directory and never modifies user-selected source files.
 - Uses one worker thread for Log analysis and Metric indexing. FTDC indexing and metric queries also share a fair sequential gate to bound heavy concurrent work.
 
@@ -47,7 +48,7 @@ See the [English User Guide](docs/user-guide.en.md) for complete operating instr
 The public image is available on [Docker Hub](https://hub.docker.com/r/whaleal/mongodb-log-analyzer) for both `linux/amd64` and `linux/arm64`. Java, Node.js, and MongoDB are not required on the host:
 
 ```bash
-docker pull whaleal/mongodb-log-analyzer:0.1.0
+docker pull whaleal/mongodb-log-analyzer:0.1.1
 
 docker run -d \
   --name mongodb-log-analyzer \
@@ -55,12 +56,12 @@ docker run -d \
   --memory=3g \
   -p 127.0.0.1:18080:18080 \
   -v mongodb-log-analyzer-data:/app/data \
-  whaleal/mongodb-log-analyzer:0.1.0
+  whaleal/mongodb-log-analyzer:0.1.1
 ```
 
 Open `http://127.0.0.1:18080` after the container starts. The container runs as a non-root user, caps the JVM heap at 2 GB, and persists task data in the `mongodb-log-analyzer-data` named volume. The application has no accounts or authorization, so the example publishes the port to the local machine only; do not expose it directly to the public Internet. Keep the named volume when upgrading or recreating the container, and avoid commands such as `docker compose down -v` that would delete it.
 
-The `latest` tag is also available, but pinned deployments should use the explicit `0.1.0` version.
+The `latest` tag is also available, but pinned deployments should use the explicit `0.1.1` version.
 
 ### Run the JAR
 

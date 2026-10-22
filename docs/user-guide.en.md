@@ -48,7 +48,7 @@ docker run -d \
   --memory=3g \
   -p 127.0.0.1:18080:18080 \
   -v mongodb-log-analyzer-data:/app/data \
-  whaleal/mongodb-log-analyzer:0.1.0
+  whaleal/mongodb-log-analyzer:0.1.1
 ```
 
 Open `http://127.0.0.1:18080` after startup. Use `docker stop mongodb-log-analyzer` to stop the application and `docker start mongodb-log-analyzer` to start it again.
@@ -78,6 +78,10 @@ Run:
 Double-click `scripts\start.bat`.
 
 After a successful start, the launcher normally opens `http://127.0.0.1:18080`. Open that address manually if no browser window appears.
+
+No dialog appears on first use. After 24 elapsed hours, a visible page automatically shows the author introduction only once, linking to the author's profile, the Whaleal MongoDB product, and `whaleal-dev` public repositories. The top-right `关于作者` button opens it at any time. Dismiss it with `继续使用`, the close button, the backdrop, or `Esc`. Manually viewing it, or having seen the previous version, suppresses the automatic reminder. First-use time and viewed status are saved in the browser across page reloads, application restarts, and workspace switches. The delay means elapsed time, not cumulative active use. Links open in a new tab only after a click; the dialog does not automatically load external content or upload analysis data.
+
+Clearing site data, changing browsers, or using a different application address resets the delay. When browser storage is unavailable, first-use time and viewed status can only be maintained within the current page.
 
 To stop the application, close the launcher window or press `Ctrl+C` in its terminal. Avoid force-stopping it while a Log analysis or Metric indexing task is running. An interrupted task is marked as failed after the next startup and must be deleted and uploaded again.
 
