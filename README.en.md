@@ -31,12 +31,12 @@ docker run -d \
   --memory=3g \
   -p 127.0.0.1:18080:18080 \
   -v mongodb-log-analyzer-data:/app/data \
-  whaleal/mongodb-log-analyzer:0.1.2
+  whaleal/mongodb-log-analyzer:0.1.3
 ```
 
 Open `http://127.0.0.1:18080`. The container runs as a non-root user with a 2 GB JVM heap limit; total process memory also includes native overhead. Task data persists in the named volume, which should remain mounted when upgrading.
 
-The example pins the published `0.1.2` version. Source changes do not automatically update published JARs or images. See [GitHub Releases](https://github.com/whaleal-dev/mongodb-log/releases) for downloadable versions.
+The example pins the published `0.1.3` version. Source changes do not automatically update published JARs or images. See [GitHub Releases](https://github.com/whaleal-dev/mongodb-log/releases) for downloadable versions.
 
 ### JAR release
 

@@ -46,7 +46,7 @@ docker run -d \
   --memory=3g \
   -p 127.0.0.1:18080:18080 \
   -v mongodb-log-analyzer-data:/app/data \
-  whaleal/mongodb-log-analyzer:0.1.2
+  whaleal/mongodb-log-analyzer:0.1.3
 ```
 
 启动后访问 `http://127.0.0.1:18080`。执行 `docker stop mongodb-log-analyzer` 停止，执行 `docker start mongodb-log-analyzer` 再次启动。
