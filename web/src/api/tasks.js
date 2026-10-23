@@ -1,12 +1,4 @@
-async function request(url, options) {
-  const response = await fetch(url, options)
-  const text = await response.text()
-  const body = text ? JSON.parse(text) : null
-  if (!response.ok) {
-    throw new Error(body?.message || `请求失败（HTTP ${response.status}）`)
-  }
-  return body
-}
+import { request } from './request.js'
 
 export function createTask(name, files) {
   const form = new FormData()
@@ -61,14 +53,6 @@ export async function downloadReport(taskId) {
   } finally {
     URL.revokeObjectURL(objectUrl)
   }
-}
-
-export function fetchSlowQueries(taskId, params = {}) {
-  const query = new URLSearchParams()
-  Object.entries(params).forEach(([key, value]) => {
-    if (value !== undefined && value !== null && value !== '') query.set(key, value)
-  })
-  return request(`/api/tasks/${encodeURIComponent(taskId)}/slow-queries?${query}`)
 }
 
 export function fetchSlowQuery(taskId, queryId) {

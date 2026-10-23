@@ -250,7 +250,7 @@ FTDC 建索引、序列查询以及内部分页／导出组件共用 `FtdcOperat
 - 先匹配固定日志头，再解析时间戳。
 - 支持 `find`、`aggregate`、`insert`、`update`、`remove`、`getMore`、`findAndModify` 和 `createIndexes`。
 - `BalancedDocumentExtractor` 按花括号深度提取嵌套命令，并正确忽略字符串中的花括号和转义引号。
-- 旧版未加引号的键会转成可解析 JSON；`ObjectId`、`NumberLong`、`Timestamp` 等 BSON 构造器替换为占位值。
+- 旧版未加引号的键会转成可解析 JSON；`ObjectId`、`NumberLong`、`Timestamp` 等 BSON 构造器替换为占位值。转换只作用于引号字符串之外，保留字符串内容与转义。
 - 找不到完整命令主体时保留已解析字段，并返回 `PARTIAL`。
 - `NETWORK` 日志用于连接统计，不误判为慢查询。
 - 仅匹配消息中的 `Heartbeat failed`，不会把 checkpoint 恢复文本误判成心跳失败。
@@ -440,7 +440,7 @@ data/
 - 散点只加载 `timestamp + duration + queryId` 的轻量数据。
 - 用户点击后才请求单条完整详情。
 - 后端重新解析保留的原始行，补充消息 ID、级别、组件、上下文和消息。
-- 表格分页支持 Namespace、操作、执行计划和最低耗时筛选，每页最多 200 条。
+- 慢查询分页 API 支持 Namespace、操作、执行计划和最低耗时筛选，每页最多 200 条；当前页面通过散点和查询模式查看明细，没有分页表入口。
 
 #### 竞态处理
 
@@ -530,7 +530,7 @@ data/
 - 压缩流结束后不允许存在剩余数据。
 - baseline BSON 长度、属性数量、delta 数量和展平结果必须一致。
 - uvarint 截断或溢出立即失败。
-- RLE 零游程不能越过声明的指标单元格数量。
+- RLE 零游程不能越过声明的指标单元格数量；无符号数量超出有符号 long 范围时立即拒绝，不允许负值绕过校验。
 - delta 流必须恰好消费完，不能有尾随数据。
 - Schema 必须包含 `start` 时间指标。
 
@@ -848,6 +848,8 @@ FTDC 必须保留源副本以支持后续按需解码，因此磁盘占用与上
 
 上传内容的解析在后台执行。创建接口返回 `202` 后发生的格式错误写入任务 `FAILED` 和 `errorMessage`，不会追溯变更创建请求的 HTTP 状态。
 
+前端 JSON 请求共用 `api/request.js`。错误响应优先展示服务端字符串消息，非 JSON 或没有有效消息时展示 HTTP 状态；成功响应不是有效 JSON 时提示响应格式错误，空响应返回 `null`。Metric 入口继续将错误文案中的 `FTDC` 显示为 `Metric`。
+
 ## 10．构建与交付设计
 
 ### 10.1 技术栈
@@ -867,11 +869,14 @@ mvn clean package
 ├── clean：删除旧构建产物
 ├── prepare-package：在 web 目录执行 npm ci
 ├── prepare-package：执行 npm run build
+├── prepare-package：清理 target/classes/static 中的旧前端资源
 ├── copy-resources：复制本次前端静态资源
 └── spring-boot-maven-plugin：生成可执行 JAR
 ```
 
 最终产物为 `target/mongodb-log-analyzer.jar`。发布目录还应包含三个平台启动脚本。
+
+增量 `mvn package` 同样在复制前清理前端输出目录，避免旧哈希文件进入 JAR。该步骤只清理 `target/classes/static`，保留生成的前端资源、其他构建输出和任务数据。
 
 Maven 生命周期执行后端测试，但没有配置执行前端测试；完整验证还需单独运行 Vitest。Dockerfile 的多阶段构建会分别运行前后端测试。首次构建需要网络下载依赖，离线承诺针对已构建应用的运行阶段。
 
@@ -915,15 +920,7 @@ Maven 生命周期执行后端测试，但没有配置执行前端测试；完�
 
 ### 11.4 验证命令
 
-```bash
-mvn test
-cd web
-npm ci
-npm test -- --run
-npm run build
-cd ..
-mvn clean package
-```
+构建环境与前后端全量验证命令统一见 [README 的源码构建说明](../README.md#从源码构建) 。Maven 打包不执行前端测试，不能代替单独运行 Vitest。
 
 真实 FTDC 验收测试通过系统属性 `ftdc.real.sample` 读取外部样本。先将 `FTDC_SAMPLE_PATH` 设置为本机真实 FTDC 文件路径，再执行：
 

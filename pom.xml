@@ -13,7 +13,7 @@
 
     <groupId>com.whaleal</groupId>
     <artifactId>mongodb-log-analyzer</artifactId>
-    <version>0.1.2</version>
+    <version>0.1.3</version>
     <name>MongoDB Log &amp; Metric Analyzer</name>
     <description>Offline MongoDB log and FTDC metric analyzer for operations teams</description>
 
@@ -65,6 +65,25 @@
                             <workingDirectory>${project.basedir}/web</workingDirectory>
                             <executable>npm</executable>
                             <arguments><argument>run</argument><argument>build</argument></arguments>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-clean-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>clear-frontend-output</id>
+                        <phase>prepare-package</phase>
+                        <goals><goal>clean</goal></goals>
+                        <configuration>
+                            <excludeDefaultDirectories>true</excludeDefaultDirectories>
+                            <filesets>
+                                <fileset>
+                                    <directory>${project.build.outputDirectory}/static</directory>
+                                </fileset>
+                            </filesets>
                         </configuration>
                     </execution>
                 </executions>

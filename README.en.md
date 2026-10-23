@@ -104,6 +104,14 @@ The backend uses Spring Boot and MongoDB BSON; the frontend uses Vue 3, Vite, El
 | [Project rules](CLAUDE.md) (Chinese) | Development constraints and documentation ownership |
 | [Project roadmap](ROADMAP.md) (Chinese) | Current progress, release status, and recorded validation |
 
+## Author
+
+HP is a WeChat public account writer, an internet technology and product professional, and a hands-on AI practitioner. Areas of practice include content writing, knowledge management, and AI coding tools and products.
+
+- [Author profile](https://docs.whaleal.com/resume-site/) — experience, technical background, and practical work.
+- [Whaleal Platform](https://www.whaleal.io/) — MongoDB monitoring, management, and backup platform.
+- [whaleal-dev public repositories](https://github.com/whaleal-dev) — open-source projects, source code, and updates.
+
 ## License
 
 Licensed under the [Apache License 2.0](LICENSE).

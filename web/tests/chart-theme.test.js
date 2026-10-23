@@ -3,7 +3,6 @@ import { nextTick, ref } from 'vue'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import DurationHistogram from '../src/components/DurationHistogram.vue'
 import ConnectionsChart from '../src/components/ConnectionsChart.vue'
-import FtdcMetricChart from '../src/components/ftdc/FtdcMetricChart.vue'
 import FtdcMetricGroupChart from '../src/components/ftdc/FtdcMetricGroupChart.vue'
 import PieChart from '../src/components/PieChart.vue'
 
@@ -38,9 +37,6 @@ describe('单系列图表主题', () => {
       samples: [{ timestampEpochMillis: 10800000, averageConnections: 13 },
         { timestampEpochMillis: 0, averageConnections: 8 }],
     }, [[0, 8], [3600000, null], [10800000, 13]]],
-    ['FTDC 指标', FtdcMetricChart, {
-      series: { timestamps: [1000, 2000, 5000], values: [5, null, 9] },
-    }, [[1000, 5], [2000, null], [5000, 9]]],
   ])('%s 实时采用主题标记色并保留原有数据与缺口', async (_, component, props, data) => {
     wrapper = mount(component, { props })
     await nextTick()
@@ -65,11 +61,17 @@ describe('单系列图表主题', () => {
       { metricId: 'a', path: 'server/a', timestamps: [1000, 2000, 5000], values: [5, null, 9], min: 1, max: 10, average: 6 },
     ] } } })
     await nextTick()
-    expect(setOption.mock.lastCall[0].series[0].itemStyle.color).toBe('#347961')
+    expect(setOption).toHaveBeenCalledOnce()
+    const originalOption = setOption.mock.lastCall[0]
+    expect(originalOption.color).toEqual(['#347961'])
+    expect(originalOption.series[0].itemStyle.color).toBe('#347961')
+    expect(originalOption.series[0].data).toEqual([[1000, 5], [2000, null], [5000, 9]])
+    expect(originalOption.series[0].connectNulls).toBe(false)
 
     tokens.value = { '--primary-mark': '#7659B8' }
     await nextTick()
 
+    expect(setOption).toHaveBeenCalledTimes(2)
     const option = setOption.mock.lastCall[0]
     expect(option.color).toEqual(['#7659B8'])
     expect(option.series[0].itemStyle.color).toBe('#7659B8')

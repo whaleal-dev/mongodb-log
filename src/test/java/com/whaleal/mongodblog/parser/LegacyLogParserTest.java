@@ -1,9 +1,11 @@
 package com.whaleal.mongodblog.parser;
 
+import org.bson.Document;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import java.time.OffsetDateTime;
 import java.util.stream.Stream;
@@ -93,6 +95,23 @@ class LegacyLogParserTest {
 
         assertThat(outcome.status()).isEqualTo(ParseStatus.SUCCESS);
         assertThat(outcome.entry().orElseThrow().queryPattern()).isEqualTo("{\"state\":\"?\"}");
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"{a: 1}", "[key: 2]", "ObjectId(abc)", "new Date(1)",
+            "\"escaped\" {a: 1} ObjectId(abc)", "\\\" {a: 1}"})
+    void preservesQuotedValuesThatResembleLegacySyntax(String note) {
+        String command = new Document("find", "items")
+                .append("filter", new Document("note", note)).toJson();
+        String line = "2025-03-10T13:28:38.624+0800 I COMMAND [conn1] command db.items command: find "
+                + command + " 150ms";
+
+        ParseOutcome outcome = parser.parse(line, 1, 0);
+
+        assertThat(outcome.status()).isEqualTo(ParseStatus.SUCCESS);
+        ParsedLogEntry entry = outcome.entry().orElseThrow();
+        assertThat(entry.queryPattern()).isEqualTo("{\"note\":\"?\"}");
+        assertThat(((Document) entry.attributes().get("filter")).getString("note")).isEqualTo(note);
     }
 
     @Test

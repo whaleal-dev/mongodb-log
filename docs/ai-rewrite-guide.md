@@ -106,17 +106,7 @@
 
 ### 4.4 分层验证
 
-先运行目标测试，再运行受影响测试与全量验证。源码构建推荐 Java 17、Maven 和 Node.js `22.12+` 的 22 系列或 Node.js 24：
-
-```bash
-mvn test
-cd web
-npm ci
-npm test -- --run
-npm run build
-cd ..
-mvn clean package
-```
+先运行目标测试，再运行受影响测试与全量验证。构建环境及完整命令统一见 [README 的源码构建说明](../README.md#从源码构建) 。
 
 首次验证先 `npm ci`；依赖未变化时不必在每次目标测试前重复安装。Maven 打包不代替前端测试。涉及上传、结果或详情交互时，还需启动本次 JAR 完成浏览器验收。
 

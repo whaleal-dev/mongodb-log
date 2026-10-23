@@ -102,6 +102,14 @@ docker build -t mongodb-log-analyzer:local .
 | [项目规范](CLAUDE.md) | 开发硬约束与文档职责 |
 | [项目路线图](ROADMAP.md) | 当前进度、发布状态和实际验证记录 |
 
+## 作者
+
+HP，公众号自媒体写作者、互联网技术与产品人，一线 AI 实践者，主要实践方向包括自媒体写作、知识管理和 AI 编程工具／产品。
+
+- [作者简介](https://docs.whaleal.com/resume-site/) ：经历、技术背景与实践。
+- [Whaleal Platform](https://www.whaleal.io/) ：MongoDB 监控、管理与备份平台。
+- [whaleal-dev 公开仓库](https://github.com/whaleal-dev) ：组织开源项目、源码与更新。
+
 ## 开源许可
 
 本项目使用 [Apache License 2.0](LICENSE) 开源。

@@ -59,7 +59,7 @@ public final class FtdcBlockScanner {
                             zerosLeft = varInts.read(payload, cursor);
                             long processed = (long) attribute * numDeltas + point + 1;
                             long remaining = (long) numAttributes * numDeltas - processed;
-                            if (zerosLeft > remaining) {
+                            if (zerosLeft < 0 || zerosLeft > remaining) {
                                 throw new FtdcFormatException(location + "零游程超出声明的属性数据");
                             }
                         }

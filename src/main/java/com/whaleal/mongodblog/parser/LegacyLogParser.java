@@ -135,34 +135,49 @@ public final class LegacyLogParser implements LogParser {
     }
 
     private Optional<Document> parseLegacyDocument(String document) {
-        String sanitized = replaceBsonConstructors(document);
-        Matcher matcher = LEGACY_KEY.matcher(sanitized);
-        StringBuilder json = new StringBuilder();
-        while (matcher.find()) {
-            String replacement = matcher.group(1) + "\"" + matcher.group(2) + "\"" + matcher.group(3);
-            matcher.appendReplacement(json, Matcher.quoteReplacement(replacement));
-        }
-        matcher.appendTail(json);
         try {
-            return Optional.of(Document.parse(json.toString()));
+            return Optional.of(Document.parse(sanitizeLegacyDocument(document)));
         } catch (RuntimeException invalidBson) {
             return Optional.empty();
         }
     }
 
-    private String replaceBsonConstructors(String source) {
-        String current = source;
-        Matcher matcher = BSON_CONSTRUCTOR.matcher(current);
-        while (matcher.find()) {
-            int openParenthesis = current.indexOf('(', matcher.start());
-            int end = matchingParenthesis(current, openParenthesis);
-            if (end < 0) {
-                return current;
+    private String sanitizeLegacyDocument(String source) {
+        StringBuilder json = new StringBuilder();
+        Matcher key = LEGACY_KEY.matcher(source);
+        Matcher constructor = BSON_CONSTRUCTOR.matcher(source);
+        boolean quoted = false;
+        boolean escaped = false;
+        for (int index = 0; index < source.length(); index++) {
+            char current = source.charAt(index);
+            if (quoted) {
+                json.append(current);
+                if (escaped) {
+                    escaped = false;
+                } else if (current == '\\') {
+                    escaped = true;
+                } else if (current == '"') {
+                    quoted = false;
+                }
+                continue;
             }
-            current = current.substring(0, matcher.start()) + "\"?\"" + current.substring(end + 1);
-            matcher = BSON_CONSTRUCTOR.matcher(current);
+            if (current == '"') {
+                quoted = true;
+            } else if (key.region(index, source.length()).lookingAt()) {
+                json.append(key.group(1)).append('"').append(key.group(2)).append('"').append(key.group(3));
+                index = key.end() - 1;
+                continue;
+            } else if (constructor.region(index, source.length()).lookingAt()) {
+                int end = matchingParenthesis(source, source.indexOf('(', index));
+                if (end >= 0) {
+                    json.append("\"?\"");
+                    index = end;
+                    continue;
+                }
+            }
+            json.append(current);
         }
-        return current;
+        return json.toString();
     }
 
     private int matchingParenthesis(String source, int start) {

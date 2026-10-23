@@ -1,9 +1,7 @@
-async function request(url, options = {}) {
-  const response = await fetch(url, options)
-  const text = await response.text()
-  const body = text ? JSON.parse(text) : null
-  if (!response.ok) throw new Error(body?.message?.replaceAll('FTDC', 'Metric') || `请求失败（HTTP ${response.status}）`)
-  return body
+import { request as requestJson } from './request.js'
+
+function request(url, options = {}) {
+  return requestJson(url, options, message => message.replaceAll('FTDC', 'Metric'))
 }
 
 function queryString(params) {

@@ -48,7 +48,7 @@ docker run -d \
   --memory=3g \
   -p 127.0.0.1:18080:18080 \
   -v mongodb-log-analyzer-data:/app/data \
-  whaleal/mongodb-log-analyzer:0.1.1
+  whaleal/mongodb-log-analyzer:0.1.2
 ```
 
 Open `http://127.0.0.1:18080` after startup. Use `docker stop mongodb-log-analyzer` to stop the application and `docker start mongodb-log-analyzer` to start it again.
@@ -117,7 +117,6 @@ Useful interactions:
 - Switch a chart to its data-table view when exact values are needed.
 - Use the question-mark icon beside a metric name to see its unit, range, and aggregation rules.
 - Click a point in a slow-query scatter plot to inspect parsed fields, locally generated investigation hints, the retained record, and its original log text.
-- Filter retained slow-query details by namespace, operation, plan summary, or minimum duration. The backend returns at most 200 retained records per page.
 - The Top 50 query patterns initially appear by frequency. Clicking a column header only reorders the 50 already selected patterns; it does not change which patterns belong to the Top 50.
 - Above the pattern table, search namespaces or query fields, select an operation type, and search plan text such as `COLLSCAN`. Text searches ignore case and surrounding whitespace; all active conditions must match. The table shows the matching count, and `重置` clears the filters. Filtering only narrows the already selected Top 50, resets when switching tasks, and does not change the task aggregates exported in the report.
 - Drag the bottom-right corner of a metric panel to resize it. Layout is stored in the current browser and can be cleared with `恢复默认布局` (Restore default layout).
@@ -131,7 +130,7 @@ Click `导出 AI 分析报告` (Export AI analysis report) to download a Markdow
 
 The application does not automatically send the report anywhere. It excludes full commands, complete raw logs, and attributes. During export it masks MongoDB URIs, IPv4 and IPv6 addresses, email addresses, and values explicitly labeled with `user`, `username`, `principal`, `password`, `passwd`, `token`, or `secret`. Task names, file names, namespaces, normalized query patterns, execution plans, and other aggregate fields can still appear, so review the exported file against your organization's data-security requirements before sharing it.
 
-Report sanitization does not anonymize the local task directory. Retained slow-query details contain original log text, attributes, and potentially command literals. FTDC copies are also original diagnostic data; handle them with the same care as source files. The source version being prepared for `0.1.2` adds sanitization before diagnostic messages are saved, but upgrading does not rewrite results already saved by older versions. Sanitization covers recognized formats, including JSON key-value pairs and quoted identity or credential values; it does not guarantee anonymity for arbitrary free text.
+Report sanitization does not anonymize the local task directory. Retained slow-query details contain original log text, attributes, and potentially command literals. FTDC copies are also original diagnostic data; handle them with the same care as source files. Since `0.1.2`, diagnostic messages are sanitized before being saved, but upgrading does not rewrite results already saved by older versions. Sanitization covers recognized formats, including JSON key-value pairs and quoted identity or credential values; it does not guarantee anonymity for arbitrary free text.
 
 Diagnostics are saved separately. Missing historical diagnostics or a failure to save diagnostics does not invalidate a completed slow-query analysis. The page reports unavailable diagnostics, and the report falls back to available aggregates. For complete diagnostics, check disk space and permissions, then upload the source files again.
 

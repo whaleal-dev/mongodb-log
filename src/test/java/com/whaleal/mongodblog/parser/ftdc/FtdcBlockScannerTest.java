@@ -9,6 +9,8 @@ import org.bson.BsonInt64;
 import org.bson.BsonString;
 import org.bson.BsonTimestamp;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import java.util.Arrays;
 import java.util.List;
@@ -129,5 +131,36 @@ class FtdcBlockScannerTest {
         assertThatThrownBy(() -> new FtdcBlockScanner().scan(invalidRle, 0, 0))
                 .isInstanceOf(FtdcFormatException.class)
                 .hasMessageContaining("零游程超出声明");
+    }
+
+    @ParameterizedTest
+    @ValueSource(longs = {Long.MIN_VALUE, -1L})
+    void rejectsRleWithUnsignedCountsAboveSignedLongRange(long count) {
+        BsonDocument baseline = new BsonDocument("start", new BsonDateTime(1))
+                .append("counter", new BsonInt64(5));
+        byte[] deltas = new byte[13];
+        for (int index = 1; index < 10; index++) {
+            deltas[index] = (byte) ((count & 0x7f) | 0x80);
+            count >>>= 7;
+        }
+        deltas[10] = (byte) count;
+        byte[] invalidRle = FtdcFixtureBuilder.compressedBlockData(baseline, 2, 1, deltas);
+
+        assertThatThrownBy(() -> new FtdcBlockScanner().scan(invalidRle, 23, 4))
+                .isInstanceOf(FtdcFormatException.class)
+                .hasMessageContaining("FTDC 偏移 23，block 4")
+                .hasMessageContaining("零游程超出声明");
+    }
+
+    @Test
+    void acceptsRleThatExactlyFillsRemainingMetricCells() {
+        BsonDocument baseline = new BsonDocument("start", new BsonDateTime(1))
+                .append("counter", new BsonInt64(5));
+        byte[] validRle = FtdcFixtureBuilder.compressedBlockData(baseline, 2, 2, new byte[]{0, 3});
+
+        FtdcBlockScanner.ScannedBlock block = new FtdcBlockScanner().scan(validRle, 0, 0);
+
+        assertThat(block.lastValues()).containsExactly(1, 5);
+        assertThat(block.zerosAtStart()).containsExactly(0, 2);
     }
 }
